@@ -1,0 +1,29 @@
+random_seed: 1234
+
+dataset:
+  name: 'BodyDataset'
+
+  source_data:
+    path: '/home/yf/Slimed_NF' #'/home/yf/NFData'
+    extra:
+      image_pattern: 'STIR.mhd' # 用来过滤文件，获取正确文件的
+      label_pattern: 'STIR_Label.mhd'
+
+  output_data:
+    data_record: 'records' # tfrecord数据存放位置
+    k: 5 # 分成k份文件
+    train_scale: 0.8
+
+  examples:
+    value:
+      - 'TwoDExample'
+    description: '创建tf_example的策略'
+
+  extra:
+    value: None
+    description: '额外可能需要用的参数'
+
+
+
+
+
