@@ -26,13 +26,7 @@ class BaseEvaluate:
         for key, value in params.items():
             self._metric_values[key].append(value)
 
-    def _predict_with_session(self, session, prediction_evaluated, steps):
-        def _get_batch_length():
-            batch_length = None
-            for key, value in prediction_evaluated.items():
-                batch_length = batch_length or value.shape[0]
-            return batch_length
-
+    def _predict_with_session(self, session, predictions, steps):
         # todo improve predictions
         feed_dict = dict()
         feed_dict[self.estimator.handler] = self.estimator.mode_dict['EvalMode'].handler
@@ -43,9 +37,8 @@ class BaseEvaluate:
             while True:
                 if steps and counter >= steps:
                     break
-                prediction_evaluated = session.run(prediction_evaluated, feed_dict)
-                for i in range(_get_batch_length()):
-                    yield {key: value[i] for key, value in prediction_evaluated.items()}
+                prediction_evaluated = session.run(predictions, feed_dict)
+                yield prediction_evaluated
                 counter += 1
         except errors_impl.OutOfRangeError:
             tf.logging.error("predict_with_session error")

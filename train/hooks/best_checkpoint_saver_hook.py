@@ -21,6 +21,7 @@ class BestCheckpointSaverHook(SessionRunHook):
         self._summary_tag = tag + '/Eval/{}'
         self._summary_writer = None
         self._checkpoint_path = Path(checkpoint_dir) / checkpoint_name
+        self._saver = None
 
         self._timer = SecondOrStepTimer(every_steps=evaluator.eval_steps)
         self._global_step_tensor = training_util._get_or_create_global_step_read()
@@ -29,9 +30,8 @@ class BestCheckpointSaverHook(SessionRunHook):
         self._better_result = None
 
         if self._get_best_result_dump_file().exists():
-            with self._get_best_result_dump_file().open() as file:
-                self._better_result = yaml_tools.read(file)
-                tf.logging.info("load completed best result records")
+            self._better_result = yaml_tools.read(self._get_best_result_dump_file())
+            tf.logging.info("load completed best result records")
 
     def begin(self):
         self._summary_writer = SummaryWriterCache.get(self.checkpoint_dir)
@@ -41,8 +41,7 @@ class BestCheckpointSaverHook(SessionRunHook):
 
     def after_run(self, run_context, run_values):
         stale_global_step = run_values.results
-        if self._timer.should_trigger_for_step(
-                stale_global_step + self._steps_per_run):
+        if self._timer.should_trigger_for_step(stale_global_step + self._steps_pre_run):
             global_step = run_context.session.run(self._global_step_tensor)
             if self._timer.should_trigger_for_step(global_step):
                 self._timer.update_last_triggered_step(global_step)
@@ -95,10 +94,9 @@ class BestCheckpointSaverHook(SessionRunHook):
         if not self._need_save:
             return False
         self._need_save = False
-        self._get_saver().save(session, self._save_path, global_step=step,
+        self._get_saver().save(session, self._checkpoint_path, global_step=step,
                                latest_filename="checkpoint_best")
-        with self._get_best_result_dump_file().open("w") as file:
-            yaml_tools.write(file, self._get_result())
+        yaml_tools.write(self._get_best_result_dump_file(), self._get_result())
         should_stop = False
         tf.logging.info("saved best checkpoints for {} into {}".format(step, str(self._checkpoint_path)))
         return should_stop

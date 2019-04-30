@@ -1,6 +1,7 @@
 tag: 'twod_unet' # 这次训练的名称
+CUDA_VISIBLE_DEVICES: '1'
 random_seed: 1234
-batch_size: 8
+batch_size: 4
 
 estimator:
   num_steps: 400000
@@ -20,7 +21,7 @@ dataset:
   min_window_level: 0
   max_window_level: 2000
   image_height: 512
-  image_width: 512
+  image_width: 128
   num_parallel_batches: 1
   image_augmentation:
     random_zoom_in:

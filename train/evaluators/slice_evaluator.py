@@ -12,11 +12,13 @@ class SliceEvaluator(BaseEvaluate):
         tf.logging.info('set completed {} evaluate config'.format(self.name))
 
     def compare(self, *args, **kwargs):
-        def _compare(current_result, origin_result, metric_list):
-            for key in metric_list:
-                if current_result[key] == origin_result[key]:
-                    continue
-                return True if current_result[key] > origin_result[key] else False
+        def _compare(current_result, origin_result, **kwargs):
+            for name in self.metric_list:
+                for key in current_result:
+                    if name in key:
+                        if current_result[key] == origin_result[key]:
+                            continue
+                        return True if current_result[key] > origin_result[key] else False
             return False
 
         return _compare(*args, **kwargs)
@@ -30,7 +32,7 @@ class SliceEvaluator(BaseEvaluate):
         predict_generation = self._predict_with_session(session, predictions, None)
         for prediction in predict_generation:
             self.append_metrics(prediction)
-        results = {key: np.mean(values) for key, values in self.model_dict.items()}  # todo test 测试下
+        results = {key: np.mean(values) for key, values in self._metric_values.items()}
         display = ''
         for key, value in results.items():
             display += '{}----->{:.3f}\t'.format(key, value)

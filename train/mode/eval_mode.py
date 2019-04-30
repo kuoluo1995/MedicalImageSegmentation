@@ -18,9 +18,9 @@ class EvalMode(BaseMode):
                 image = self.adjust_window_size(image, params['min_window_level'], params['max_window_level'])
                 feature['image'] = tf.squeeze(image, axis=0)
             with tf.name_scope("UnitedLabelSize/"):
+                label = tf.clip_by_value(label, 0, 1)
                 label = tf.image.resize_nearest_neighbor(tf.expand_dims(tf.expand_dims(label, axis=0), axis=-1),
                                                          [params['image_height'], params['image_width']])
-                label = image_process_operations.adjust_window_size(label, 0, 1)  # todo improve 这里有固定值。
                 label = tf.squeeze(label, axis=(0, -1))
             return feature, label
 

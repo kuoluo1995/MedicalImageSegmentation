@@ -1,3 +1,4 @@
+import os
 import tensorflow as tf
 import yaml
 from tensorflow.python import ops
@@ -13,7 +14,7 @@ def main():
     estimate_config = yaml.load(config_file)
     config.set_logger(estimate_config['tag'])
     tf.logging.info('input params:{}'.format(estimate_config))
-
+    os.environ['CUDA_VISIBLE_DEVICES'] = estimate_config['CUDA_VISIBLE_DEVICES']
     with context.graph_mode():
         with ops.Graph().as_default():
             estimate.set_config(estimate_config)
