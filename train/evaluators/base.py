@@ -41,8 +41,7 @@ class BaseEvaluate:
                 yield prediction_evaluated
                 counter += 1
         except errors_impl.OutOfRangeError:
-            tf.logging.error("predict_with_session error")
-        pass
+            pass
 
     @abstractmethod
     def set_config(self, params):

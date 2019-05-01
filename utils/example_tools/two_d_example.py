@@ -42,6 +42,6 @@ class TwoDExample(BaseExample):
                 label = tf.to_int32(label)
 
             return_feature = {'image': image, 'name': features['image/name'], 'index': features['extra/index']}
-            with tf.control_dependencies(
-                    [tf.print('\r>> index:', return_feature['index'], '#shape:', tf.shape(label))]):
-                return return_feature, label
+            # with tf.control_dependencies(
+            #         [tf.print('\r>> index:', return_feature['index'], '#shape:', tf.shape(label))]):
+            return return_feature, label
