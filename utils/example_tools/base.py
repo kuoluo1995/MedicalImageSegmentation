@@ -33,7 +33,7 @@ class BaseExample:
 
     def write_example(self, i, fold):
         for j, data in enumerate(fold):
-            print("\r>> Converting {}: fold {}, {}/{}".format(str(self.__class__), i + 1, j + 1, len(fold)))
+            print("Converting {}: fold {}, {}/{}".format(str(self.__class__), i + 1, j + 1, len(fold)))
             self.image_tool.read(data['image'])
             self.label_tool.read(data['label'])
 

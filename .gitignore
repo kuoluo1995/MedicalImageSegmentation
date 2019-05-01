@@ -1,4 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
+# 文件
 _model_dir
 dataset
 logs
+.idea
+# 代码
+test.py

@@ -25,7 +25,7 @@ class LogLearningRateHook(SessionRunHook):
 
     def after_run(self, run_context, run_values):
         learning_rate, global_step = run_values.results
-        if self._timer.should_trigger_for_step(global_step + self._steps_per_run):
+        if self._timer.should_trigger_for_step(global_step + self.steps_per_run):
             global_step = run_context.session.run(self._global_step_tensor)
             if self._timer.should_trigger_for_step(global_step):
                 self._timer.update_last_triggered_step(global_step)

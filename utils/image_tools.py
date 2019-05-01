@@ -46,3 +46,6 @@ class ImageTool(object):
         self._reader = eval(self.format + '_reader')
         self._writer = eval(self.format + '_writer')
         self._decode = self._reader(image_file).astype(self._type, copy=False)
+
+    def transpose(self, dims):
+        self._decode = self._decode.transpose(dims)

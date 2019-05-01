@@ -97,8 +97,7 @@ class MyEstimator(object):
 
     def train(self):
         feature, label, input_hooks, handler = self._get_input_pipeline()
-        with tf.control_dependencies([tf.print(feature, label)]):
-            self.handler = handler
+        self.handler = handler
         model = self._get_model(feature, label)
         if self._warm_start_settings:
             tf.logging.info('building warm start..........................................')
