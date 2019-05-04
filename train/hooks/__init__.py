@@ -20,7 +20,6 @@ def get_work_hooks(params, *hooks):
         BestCheckpointSaverHook(params['tag'], params['evaluator'], str(params['model_dir']), params['steps_pre_run']))
     work_hooks.append(
         LogLearningRateHook(params['every_steps'], params['steps_pre_run'], str(params['model_dir']), params['tag']))
-    tf.logging.info('build completed work hooks')
     return work_hooks
 
 
@@ -31,8 +30,8 @@ def get_chief_hooks_tuple(params, *hooks):
             continue
         if isinstance(hook, list):
             checkpoint_hooks += hook
-    checkpoint_hooks.append(CheckpointSaverHook(str(params['model_dir']), save_secs=params['config'].save_checkpoints_secs,
-                                                save_steps=params['config'].save_checkpoints_steps,
-                                                scaffold=params['model'].scaffold))
+    checkpoint_hooks.append(
+        CheckpointSaverHook(str(params['model_dir']), save_secs=params['config'].save_checkpoints_secs,
+                            save_steps=params['config'].save_checkpoints_steps, scaffold=params['model'].scaffold))
 
     return tuple(checkpoint_hooks)

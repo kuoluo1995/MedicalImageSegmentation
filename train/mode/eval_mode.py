@@ -5,26 +5,27 @@ class EvalMode(BaseMode):
     name = 'eval'
 
     def set_config(self, **params):
+        tf.logging.info('..... setting {} mode config'.format(self.name))
         self.dataset_path = params['dataset_path']
-        tf.logging.info('set  completed {} mode config'.format(self.name))
 
     def get_dataset(self, **params):
         def _data_preprocess(example_proto):
             # 将example转化成数据
             feature, label = example.read_example(example_proto, self, **params)
-            with tf.name_scope("UnitedImageSize/"):
+            with tf.variable_scope('UnitedImageSize'):
                 image = image_process_operations.resize_image(feature['image'], params['image_height'],
                                                               params['image_width'])
                 image = self.adjust_window_size(image, params['min_window_level'], params['max_window_level'])
                 feature['image'] = tf.squeeze(image, axis=0)
-            with tf.name_scope("UnitedLabelSize/"):
+            with tf.variable_scope('UnitedLabelSize'):
                 label = tf.clip_by_value(label, 0, 1)
                 label = tf.image.resize_nearest_neighbor(tf.expand_dims(tf.expand_dims(label, axis=0), axis=-1),
                                                          [params['image_height'], params['image_width']])
                 label = tf.squeeze(label, axis=(0, -1))
             return feature, label
 
-        with tf.name_scope('EvalDataset/'):
+        with tf.variable_scope('EvalDataset'):
+            tf.logging.info('..... get {} dataset'.format(self.name))
             dataset_dict = yaml_tools.read(params['base_path'] / self.dataset_path)
             example = example_tools.create_example(dataset_dict['example'])
             # todo improve 找一种一次性拿出来的方法
@@ -36,7 +37,6 @@ class EvalMode(BaseMode):
                                                                             'num_parallel_batches'],
                                                                         drop_remainder=True))
                        .prefetch(buffer_size=contrib_data.AUTOTUNE))
-            tf.logging.info('get {} dataset'.format(self.name))
             return dataset
 
     def init_iterator(self, dataset):

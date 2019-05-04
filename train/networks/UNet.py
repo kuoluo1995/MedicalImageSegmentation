@@ -7,6 +7,7 @@ class UNet(BaseNet):
     num_down_samples = None
 
     def set_config(self, **params):
+        tf.logging.info('..... setting {} config'.format(self.name))
         # 必填参数
         self.tag = params['tag']
         self.init_channels = params['init_channels']
@@ -22,11 +23,11 @@ class UNet(BaseNet):
         self.train_metrics = params['train_metrics']
         # 选填参数
         self.num_down_samples = params['num_down_samples']
-        tf.logging.info('set completed {} network config'.format(self.name))
 
     def _build_network(self, image):
-        tensor_out = image
-        with tf.name_scope('UNet/'):
+        tf.logging.info('................>>>>>>>>>>>>>>>> building {} network'.format(self.name))
+        with tf.variable_scope('UNet'):
+            tensor_out = image
             out_channels = self.init_channels
             # 下采样
             encoder_layers = dict()
@@ -50,12 +51,12 @@ class UNet(BaseNet):
 
             # 最后一把全连接 转化成输出图片 todo test 这个的效果如何 slim.arg_scope
             with slim.arg_scope([slim.conv2d], activation_fn=None, normalizer_fn=None, normalizer_params=None):
-                logits = slim.conv2d(tensor_out, len(self.classes), 1, scope="Adjust_Channels")
-                tf.logging.info('build completed {} network'.format(self.name))
+                logits = slim.conv2d(tensor_out, len(self.classes), 1, scope="AdjustChannels")
                 return logits
 
     def _build_prediction(self, logits):
-        with tf.name_scope('Prediction/'):
+        tf.logging.info('................>>>>>>>>>>>>>>>> building prediction')
+        with tf.variable_scope('Prediction'):
             # 化成概率的情况
             logits_probability = slim.softmax(logits)
             # 切割 一个类一个 logits
@@ -64,18 +65,18 @@ class UNet(BaseNet):
             ones = tf.ones_like(zeros, dtype=tf.uint8)
             for i, key in enumerate(self.classes):
                 self.classes[key]['prediction'] = tf.where(classes_logits[i] > 0.5, ones, zeros, name=key + '_predict')
-            tf.logging.info('build completed prediction')
 
     def _build_loss(self, logits, label):
-        with tf.name_scope('Losses/'):
+        tf.logging.info('................>>>>>>>>>>>>>>>> building loss')
+        with tf.variable_scope('Losses'):
             loss_function.get_loss(self.loss_name, logits, label, self.classes)
             total_loss = tf.losses.get_total_loss()
             tf.losses.add_loss(total_loss)
-            tf.logging.info('build completed loss')
             return total_loss
 
     def _build_metrics(self):
-        with tf.name_scope('Metrics/'):
+        tf.logging.info('................>>>>>>>>>>>>>>>> building metrics')
+        with tf.variable_scope('Metrics'):
             for i, key in enumerate(self.classes):
                 logits = self.classes[key]['prediction']
                 label = self.classes[key]['label']
@@ -83,27 +84,20 @@ class UNet(BaseNet):
                 for name, args in self.train_metrics.items():
                     result = metrics_function.get_mertrics(name, logits, label, args['eps'])
                     self.classes[key]['metric'][name] = result
-            tf.logging.info('build completed metrics')
 
     def _build_summary(self):
-        # todo improve 未来考虑多通道 ,并且把summary统一起来
-        with tf.name_scope("SummaryImage/"):
-            tf.summary.image('{}/{}'.format(self.tag, self.image.op.name), self.image, max_outputs=1,
+        tf.logging.info('................>>>>>>>>>>>>>>>> building summary')
+        # todo improve 未来考虑多通道 ,并且把summary统一起
+        tf.summary.image('{}/Image'.format(self.tag), self.image, max_outputs=1,
+                         collections=[CustomKeys.SUMMARIES])
+        labels = tf.expand_dims(self.label, axis=-1)
+        labels_uint8 = tf.cast(labels * 255 / len(self.classes), tf.uint8)
+        tf.summary.image('{}/Label'.format(self.tag), labels_uint8, max_outputs=1,
+                         collections=[CustomKeys.SUMMARIES])
+        for key, value in self.classes.items():
+            tf.summary.image('{}/Prediction/{}'.format(self.tag, key), value['prediction'] * 255, max_outputs=1,
                              collections=[CustomKeys.SUMMARIES])
-        with tf.name_scope("SummaryLabel/"):
-            labels = tf.expand_dims(self.label, axis=-1)
-            labels_uint8 = tf.cast(labels * 255 / len(self.classes), tf.uint8)
-            tf.summary.image('{}/{}'.format(self.tag, self.label.op.name), labels_uint8, max_outputs=1,
-                             collections=[CustomKeys.SUMMARIES])
-        with tf.name_scope("SummaryPrediction/"):
-            for key, value in self.classes.items():
-                tf.summary.image('{}/{}'.format(self.tag, key), value['prediction'] * 255, max_outputs=1,
-                                 collections=[CustomKeys.SUMMARIES])
-        with tf.name_scope("SummaryLoss/"):
-            for loss in loss_function.get_total_loss():
-                tf.summary.scalar('{}/{}'.format(self.tag, loss.op.name), loss, collections=[CustomKeys.SUMMARIES])
-        with tf.name_scope("SummaryMetrics/"):
-            for metrics in metrics_function.get_total_mertrics():
-                tf.summary.scalar('{}/{}'.format(self.tag, metrics.op.name), metrics,
-                                  collections=[CustomKeys.SUMMARIES])
-        tf.logging.info('build completed summary')
+        for loss in loss_function.get_total_loss():
+            tf.summary.scalar('{}/{}'.format(self.tag, loss.op.name), loss, collections=[CustomKeys.SUMMARIES])
+        for metrics in metrics_function.get_total_mertrics():
+            tf.summary.scalar('{}/{}'.format(self.tag, metrics.op.name), metrics, collections=[CustomKeys.SUMMARIES])

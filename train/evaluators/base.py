@@ -16,7 +16,7 @@ class BaseEvaluate:
     _metric_values = defaultdict(list)
 
     def __init__(self):
-        tf.logging.info('init {} evaluate'.format(self.name))
+        tf.logging.info('#### init {} evaluate'.format(self.name))
 
     def clear_metrics(self):
         for key in self._metric_values:

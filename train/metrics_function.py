@@ -16,7 +16,7 @@ def dice(logits, labels, eps):
     eps = float(eps)
     dim = len(logits.get_shape())
     sum_axis = list(range(1, dim))
-    with tf.name_scope('Dice/'):
+    with tf.variable_scope('Dice', [logits, labels, eps]):
         logits = tf.cast(logits, tf.float32)
         labels = tf.cast(labels, tf.float32)
 

@@ -21,8 +21,8 @@ class TwoDExample(BaseExample):
             yield tf.train.Example(features=tf.train.Features(feature=feature))
 
     def read_example(self, example_proto, mode, **params):  # todo improve 这里参数似乎可以改变下。
-        tf.logging.info('reading {} example'.format(self.name))
-        with tf.name_scope("ParseExample/"):
+        tf.logging.info('................>>>>>>>>>>>>>>>> reading {} example'.format(self.name))
+        with tf.variable_scope('ParseExample'):
             features = {
                 'image/name': tf.FixedLenFeature([], tf.string),
                 'image/shape': tf.FixedLenFeature([3], tf.int64),
@@ -32,11 +32,11 @@ class TwoDExample(BaseExample):
                 'extra/index': tf.FixedLenFeature([], tf.int64)
             }
             features = tf.parse_single_example(example_proto, features=features)
-            with tf.name_scope("GetImage/"):
+            with tf.variable_scope('GetImage'):
                 image = tf.decode_raw(features['image/encoded'], tf.int16)
                 image = tf.reshape(image, features['image/shape'])
                 image = tf.to_float(image)
-            with tf.name_scope("GetLabel/"):
+            with tf.variable_scope('GetLabel'):
                 label = tf.decode_raw(features['segmentation/encoded'], tf.uint8)
                 label = tf.reshape(label, features['segmentation/shape'])
                 label = tf.to_int32(label)

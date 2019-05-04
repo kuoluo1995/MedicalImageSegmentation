@@ -28,7 +28,7 @@ class BaseNet:
     train_metrics = None
 
     def __init__(self):
-        tf.logging.info('init {} network'.format(self.name))
+        tf.logging.info('#### init {} network'.format(self.name))
 
     @property
     def loss(self):
@@ -58,25 +58,32 @@ class BaseNet:
     def _build_summary(self):
         pass
 
-    def get_loss(self, feature, label):
-        # todo improve 这里未来feature可以传递过来更多有用的信息一起帮助训练
-        self.feature = feature
-        image = feature['image']
-        image.set_shape([self.batch_size, self.height, self.width, self.channel])
-        self.image = image
-        label.set_shape([self.batch_size, None, None])
-        self.label = label  # todo ques improve
-        one_hot_label = tf.one_hot(label, len(self.classes))
-        class_labels = tf.split(one_hot_label, len(self.classes), axis=-1)
-        for i, key in enumerate(self.classes):
-            self.classes[key]['label'] = class_labels[i]
-
-        self.logits = self._build_network(image)
-        self._build_prediction(self.logits)
-        loss = self._build_loss(self.logits, label)
+    def build_model(self, feature, label):
+        tf.logging.info('..... building {} model'.format(self.name))
+        self.feature = feature  # todo improve 这里未来feature可以传递过来更多有用的信息一起帮助训练
+        self.image = self._build_image(feature['image'])
+        self.label = self._build_label(label)
+        self._logits = self._build_network(self.image)
+        self._build_prediction(self._logits)
+        loss = self._build_loss(self._logits, self.label)
         self._build_metrics()
         self._build_summary()
         return loss
+
+    def _build_image(self, image):
+        tf.logging.info('................>>>>>>>>>>>>>>>> building image')
+        image.set_shape([self.batch_size, self.height, self.width, self.channel])
+        return image
+
+    def _build_label(self, label):
+        tf.logging.info('................>>>>>>>>>>>>>>>> building label')
+        label.set_shape([self.batch_size, None, None])
+        with tf.variable_scope("LabelProcess"):
+            one_hot_label = tf.one_hot(label, len(self.classes))
+            class_labels = tf.split(one_hot_label, len(self.classes), axis=-1)
+            for i, key in enumerate(self.classes):
+                self.classes[key]['label'] = class_labels[i]
+        return label
 
     def get_metrics_value(self):
         metrics_dict = dict()
@@ -95,7 +102,6 @@ class BaseNet:
             prediction_dict[key + '_prediction'] = value['prediction']
             for name, metric in value['metric'].items():
                 prediction_dict[key + '_metric' + '_' + name] = metric
-
         prediction_dict['name'] = self.feature['name']
         prediction_dict['global_step'] = tf.train.get_or_create_global_step()
         prediction_dict['index'] = self.feature['index']

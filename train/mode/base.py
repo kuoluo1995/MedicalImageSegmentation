@@ -2,6 +2,7 @@ import tensorflow as tf
 from abc import abstractmethod
 from functools import partial
 from tensorflow.contrib import data as contrib_data
+from tensorflow.python import ops
 from tensorflow.python.data import Dataset, experimental, TFRecordDataset
 from tensorflow.python.estimator import util
 from utils import example_tools, image_process_operations, yaml_tools
@@ -16,7 +17,7 @@ class BaseMode:
     string_handle = None
 
     def __init__(self):
-        tf.logging.info('init {} mode'.format(self.name))
+        tf.logging.info('#### init {} mode'.format(self.name))
 
     @abstractmethod
     def set_config(self, **params):

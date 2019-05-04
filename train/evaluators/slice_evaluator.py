@@ -5,11 +5,11 @@ class SliceEvaluator(BaseEvaluate):
     name = 'slice'
 
     def set_config(self, **params):
+        tf.logging.info('..... setting {} evaluate config'.format(self.name))
         self.eval_steps = params['eval_steps']
         self.metric_list = params['metric_list']
         self.model_dict = params['model_dict']
         self.estimator = params['estimator']
-        tf.logging.info('set completed {} evaluate config'.format(self.name))
 
     def compare(self, *args, **kwargs):
         def _compare(current_result, origin_result, **kwargs):

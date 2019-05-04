@@ -15,9 +15,11 @@ estimator:
 
 dataset:
   name: 'BodyDataset'
-  modes_and_path: # 这里包含了具体几个模式的信息
-    TrainMode: 'train_TwoDExample.yaml'
-    EvalMode: 'eval_TwoDExample.yaml'
+  modes: # 这里包含了具体几个模式的信息
+    TrainMode:
+      dataset_path: 'train_TwoDExample.yaml'
+    EvalMode:
+      dataset_path: 'eval_TwoDExample.yaml'
   min_window_level: 0
   max_window_level: 2000
   image_height: 512

@@ -33,6 +33,7 @@ class BodyDataset(BaseDataset):
 
     # *************************************************训练时用的函数************************************************* #
     def set_train_config(self, **param):
+        tf.logging.info('..... setting {} train config'.format(self.name))
         self.batch_size = param['batch_size']
         self._output_data_path = Path(__file__).parent.parent / 'dataset' / param['name']
         self.seed = param['random_seed']
@@ -41,4 +42,4 @@ class BodyDataset(BaseDataset):
         self.image_width = param['image_width']
         self.image_height = param['image_height']
         self.num_parallel_batches = param['num_parallel_batches']
-        self.image_augmentation_params = param['image_augmentation']
+        self.image_augmentation_dict = param['image_augmentation']

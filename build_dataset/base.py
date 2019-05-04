@@ -44,10 +44,10 @@ class BaseDataset:
     image_channel = 1  # todo improve 改善图像通道的生成方式 一般是灰度，所以先是1
     num_parallel_batches = None
 
-    image_augmentation_params = None
+    image_augmentation_dict = None
 
     def __init__(self):
-        tf.logging.info('init {} dataset'.format(self.name))
+        tf.logging.info('#### init {} dataset'.format(self.name))
 
     # *************************************************创建时用的函数************************************************* #
     @abstractmethod
@@ -146,7 +146,7 @@ class BaseDataset:
                                                      max_window_level=self.max_window_level,
                                                      image_height=self.image_height, image_width=self.image_width,
                                                      seed=self.seed, num_parallel_batches=self.num_parallel_batches,
-                                                     image_augmentation=self.image_augmentation_params)
+                                                     image_augmentation=self.image_augmentation_dict)
 
                 hook = mode_dict[key].init_iterator(dataset)
                 if hook is not None:
@@ -154,9 +154,9 @@ class BaseDataset:
                 if feature is None:
                     feature = dataset
         # todo improve 合理的拿出feature来的方法
-        with tf.name_scope('DatasetIterator/'):
+        with tf.variable_scope('DatasetIterator'):
+            tf.logging.info('..... building dataset iterator')
             handler = array_ops.placeholder(dtypes.string, shape=(), name='Handler')
             iterator = Iterator.from_string_handle(handler, feature.output_types, feature.output_shapes,
                                                    feature.output_classes)
-            tf.logging.info('build completed dataset iterator')
         return estimator_util.parse_iterator_result(iterator.get_next()), hooks, handler

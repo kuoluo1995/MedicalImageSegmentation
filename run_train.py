@@ -17,9 +17,12 @@ def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = estimate_config['CUDA_VISIBLE_DEVICES']
     with context.graph_mode():
         with ops.Graph().as_default():
+            tf.logging.info('#################### setting config ####################')
             estimate.set_config(estimate_config)
-            tf.logging.info('start training##########################################################################')
+            tf.logging.info('####################   end config   ####################')
+            tf.logging.info('#################### start training ####################')
             estimate.train()
+            tf.logging.info('####################  end training  ####################')
 
 
 if __name__ == "__main__":
