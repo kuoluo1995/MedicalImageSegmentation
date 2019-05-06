@@ -31,7 +31,37 @@ class MyEstimator(object):
     _init_fn = None
     _estimator_spec = None
 
-    def set_config(self, params):
+    def _get_input_pipeline(self):
+        with tf.variable_scope('InputPipeline'):
+            (feature, label), input_hooks, handler = self._dataset.get_data_iterator(self.mode_dict)
+            return feature, label, input_hooks, handler
+
+    def _get_model(self, feature, label):
+        with tf.variable_scope('Model'):
+            loss = None  # todo improve 这里未来可以考虑多个模型
+            predictions = None
+            for _, model in self._model_dict.items():
+                loss = model.build_model(feature, label)
+                predictions = model.get_predictions()
+            train_optimizer = self._solver.get_train_optimizer(loss)
+            init_fn = self._get_scaffold_init()
+            scaffold = tf.train.Scaffold(init_fn=init_fn)
+            kwargs = {'loss': loss, 'train_op': train_optimizer, 'predictions': predictions, 'scaffold': scaffold}
+            return tf.estimator.EstimatorSpec(mode=model_fn_lib.ModeKeys.TRAIN, **kwargs)
+            # todo read 这个函数预测时可能要再研究下
+
+    def _get_hooks_args(self, model):
+        tensors = {'loss': model.loss, 'step': tf.train.get_or_create_global_step()}
+        tensors.update({key: val for key, val in model.predictions.items() if '_metric' in key})
+        # todo improve 待优化hooks这种结构
+        hooks_args = {'model': model, 'num_steps': self.num_steps, 'tensors': tensors,
+                      'config': self._config, 'mode_dict': self.mode_dict, 'tag': self.tag,
+                      'evaluator': self._evaluator, 'model_dir': str(self._model_dir),
+                      'every_steps': self._evaluator.eval_steps, 'steps_pre_run': 1}
+        return hooks_args
+
+    # *************************************************训练时用的函数************************************************* #
+    def set_train_config(self, params):
         random_seed.set_random_seed(params['random_seed'])
         self.seed = params['random_seed']
         self.tag = params['tag']
@@ -43,8 +73,6 @@ class MyEstimator(object):
         self._config = estimator_lib.maybe_overwrite_model_dir_and_session_config(
             tf.estimator.RunConfig(
                 tf_random_seed=params['random_seed'],
-                save_summary_steps=params['estimator']['save_summary_steps'],
-                save_checkpoints_steps=params['estimator']['save_checkpoints_steps'],
                 session_config=config.get_session_config(params['estimator']['allow_soft_placement'],
                                                          params['estimator']['gpu_options_allow_growth']),
                 keep_checkpoint_max=params['estimator']['keep_checkpoint_max'],
@@ -124,25 +152,6 @@ class MyEstimator(object):
         self._evaluator = evaluators.create_evaluator(params['model']['evaluator']['name'])
         self._evaluator.set_config(model_dict=self._model_dict, estimator=self, **params['model']['evaluator'])
 
-    def _get_input_pipeline(self):
-        with tf.variable_scope('InputPipeline'):
-            (feature, label), input_hooks, handler = self._dataset.get_data_iterator(self.mode_dict)
-            return feature, label, input_hooks, handler
-
-    def _get_model(self, feature, label):
-        with tf.variable_scope('Model'):
-            loss = None  # todo improve 这里未来可以考虑多个模型
-            predictions = None
-            for _, model in self._model_dict.items():
-                loss = model.build_model(feature, label)
-                predictions = model.get_predictions()
-            train_optimizer = self._solver.get_train_optimizer(loss)
-            init_fn = self._get_scaffold_init()
-            scaffold = tf.train.Scaffold(init_fn=init_fn)
-            kwargs = {'loss': loss, 'train_op': train_optimizer, 'predictions': predictions, 'scaffold': scaffold}
-            return tf.estimator.EstimatorSpec(mode=model_fn_lib.ModeKeys.TRAIN, **kwargs)
-            # todo read 这个函数预测时可能要再研究下
-
     def _get_scaffold_init(self):
         # todo improve 改善
         return None
@@ -155,12 +164,42 @@ class MyEstimator(object):
                                                      self._config.keep_checkpoint_every_n_hours), defer_build=True,
                                                  save_relative_paths=True))
 
-    def _get_hooks_args(self, model):
-        tensors = {'loss': model.loss, 'step': tf.train.get_or_create_global_step()}
-        tensors.update({key: val for key, val in model.predictions.items() if '_metric' in key})
-        # todo improve 待优化hooks这种结构
-        hooks_args = {'model': model, 'num_steps': self.num_steps, 'tensors': tensors,
-                      'config': self._config, 'mode_dict': self.mode_dict, 'tag': self.tag,
-                      'evaluator': self._evaluator, 'model_dir': str(self._model_dir),
-                      'every_steps': self._evaluator.eval_steps, 'steps_pre_run': 1}
-        return hooks_args
+    # *************************************************评估时用的函数************************************************* #
+    def set_eval_config(self, params):
+        random_seed.set_random_seed(params['random_seed'])
+        self.seed = params['random_seed']
+        self.tag = params['tag']
+        self.batch_size = params['batch_size']
+        self._model_dir = Path(__file__).parent.parent / params['model']['model_dir'] / self.tag
+        self._model_dir.mkdir(parents=True, exist_ok=True)
+        self._warm_start_settings = estimator_lib._get_default_warm_start_settings(None)
+        self._config = estimator_lib.maybe_overwrite_model_dir_and_session_config(
+            tf.estimator.RunConfig(tf_random_seed=params['random_seed'],
+                                   session_config=config.get_session_config(params['estimator']['allow_soft_placement'],
+                                                                            params['estimator'][
+                                                                                'gpu_options_allow_growth'])),
+            str(self._model_dir))
+        self._set_modes(params)
+        self._set_dataset(params)
+        self._set_models(params)
+        self._set_evaluator(params)
+
+    def evaluate(self):
+        tf.logging.info('>>>>>>>>>>>>>>>>>>>> building input pipeline')
+        feature, label, input_hooks, self.handler = self._get_input_pipeline()
+        tf.logging.info('>>>>>>>>>>>>>>>>>>>> building model')
+        model = self._get_model(feature, label)
+        with tf.variable_scope('AddHooks'):
+            tf.logging.info('>>>>>>>>>>>>>>>>>>>> building hooks')
+            work_hooks = hooks.get_work_hooks(None, input_hooks, model.training_chief_hooks)
+
+        with tf.variable_scope('Training'):
+            tf.logging.info('>>>>>>>>>>>>>>>>>>>> building training')
+            with training.MonitoredSession(
+                    session_creator=training.ChiefSessionCreator(
+                        master=self._config.master,
+                        scaffold=model.scaffold,
+                        config=self._config.session_config),
+                    hooks=work_hooks) as session:
+                while not session.should_stop():
+                    _, loss = session.run([model.train_op, model.loss], self._feed_dict)

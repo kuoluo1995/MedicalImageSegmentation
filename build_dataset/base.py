@@ -1,15 +1,14 @@
 import numpy as np
 import tensorflow as tf
 from abc import abstractmethod
-from tensorflow.contrib import data as contrib_data
 from tensorflow.python.estimator import util as estimator_util
-from tensorflow.python.data import Dataset, experimental, Iterator, TFRecordDataset
+from tensorflow.python.data import Iterator
 from tensorflow.python.framework import dtypes, ops
 from tensorflow.python.ops import array_ops
 from pathlib import Path
 
-from utils import image_process_operations, example_tools, yaml_tools
-from utils.image_tools import ImageTool
+from utils import example_tools, yaml_tools
+from utils.reader_tools.reader_section import ImageReader
 
 
 def _get_records(records):
@@ -31,8 +30,8 @@ class BaseDataset:
     seed = None
     _k_folds_record = None
 
-    _image_tool = ImageTool(np.int16, is_label=False)
-    _label_tool = ImageTool(np.uint8, is_label=True)  # use uint8 to save space
+    _image_tool = ImageReader(np.int16, is_label=False)
+    _label_tool = ImageReader(np.uint8, is_label=True)  # use uint8 to save space
     _examples = None
 
     batch_size = None
@@ -123,9 +122,8 @@ class BaseDataset:
                 output_path = record_fold / '{}-{}-of-{}.tfrecord'.format(example_name, i + 1, self.k)
                 with tf.io.TFRecordWriter(str(output_path)) as example_writer:
                     example = example_tools.create_example(example_name, writer=example_writer,
-                                                           image_tool=self._image_tool,
-                                                           label_tool=self._label_tool)
-                    example.write_example(i, fold)
+                                                           image_tool=self._image_tool, label_tool=self._label_tool)
+                    example.write_example(i, fold, self.image_channel)
                 dataset.append(output_path)
                 max_fold_size = max(max_fold_size, len(fold))
             # 把结果按比例保存成yaml文件

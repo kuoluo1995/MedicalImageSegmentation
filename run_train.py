@@ -18,7 +18,7 @@ def main():
     with context.graph_mode():
         with ops.Graph().as_default():
             tf.logging.info('#################### setting config ####################')
-            estimate.set_config(estimate_config)
+            estimate.set_train_config(estimate_config)
             tf.logging.info('####################   end config   ####################')
             tf.logging.info('#################### start training ####################')
             estimate.train()

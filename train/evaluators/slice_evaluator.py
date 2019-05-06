@@ -38,3 +38,6 @@ class SliceEvaluator(BaseEvaluate):
             display += '{}----->{:.3f}\t'.format(key, value)
         tf.logging.info(display)
         return results
+
+    def evaluate(self):
+        pass

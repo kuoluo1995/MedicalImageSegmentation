@@ -13,10 +13,12 @@ dataset:
     data_record: 'records' # tfrecord数据存放位置
     k: 5 # 分成k份文件
     train_scale: 0.8
+    image_channel: 1
 
   examples:
     value:
       - 'TwoDExample'
+#      - 'ThreeDExample'
     description: '创建tf_example的策略'
 
   extra:

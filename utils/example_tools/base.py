@@ -28,10 +28,10 @@ class BaseExample:
     label_tool = None
 
     @abstractmethod
-    def _create_example_format(self):
+    def _create_example_format(self, image_channel):
         pass
 
-    def write_example(self, i, fold):
+    def write_example(self, i, fold, image_channel):
         for j, data in enumerate(fold):
             print("Converting {}: fold {}, {}/{}".format(str(self.__class__), i + 1, j + 1, len(fold)))
             self.image_tool.read(data['image'])
@@ -41,7 +41,7 @@ class BaseExample:
                 raise RuntimeError("Shape mismatched between image and label: {} vs {},image_path:{} ".format(
                     self.image_tool.shape, self.label_tool.shape, self.image_tool.image_path))
 
-            for example in self._create_example_format():
+            for example in self._create_example_format(image_channel):
                 self.writer.write(example.SerializeToString())
 
     @abstractmethod
