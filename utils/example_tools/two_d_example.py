@@ -5,8 +5,8 @@ class TwoDExample(BaseExample):
     name = 'twoD'
 
     def _create_example_format(self):
-        self.image_tool.transpose((1, 2, 0))
-        self.label_tool.transpose((1, 2, 0))
+        self.image_tool.transpose((1, 0, 2))
+        self.label_tool.transpose((1, 0, 2))
         for idx in range(self.image_tool.shape[0]):
             image, image_shape = self.image_tool.get_data_and_shape(idx)
             label, label_shape = self.label_tool.get_data_and_shape(idx)
