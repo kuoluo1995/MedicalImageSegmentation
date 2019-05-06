@@ -9,6 +9,7 @@ import build_dataset
 from train import config, evaluators, hooks, mode, networks
 from train.config import CustomKeys
 from train.solver.solver import Solver
+from utils import mhd_tools
 
 
 class MyEstimator(object):
@@ -91,7 +92,8 @@ class MyEstimator(object):
             ) as session:
                 self._feed_dict[self.handler] = self.mode_dict['TrainMode'].handler
                 while not session.should_stop():
-                    _, loss = session.run([model.train_op, model.loss], self._feed_dict)
+                    _, loss, label = session.run([model.train_op, model.loss, label], self._feed_dict)
+                    mhd_tools.mhd_writer('E:/IMAGE.mhd', label)
 
     def _set_modes(self, params):
         tf.logging.info('>>>>>>>>>>>>>>>>>>>> setting modes')

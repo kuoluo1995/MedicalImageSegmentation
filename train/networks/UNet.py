@@ -24,6 +24,21 @@ class UNet(BaseNet):
         # 选填参数
         self.num_down_samples = params['num_down_samples']
 
+    def _net_args_scope(self, *args, **kwargs):
+        # regularizer todo improve 减缓以后可以调动
+        weights_regularizer = slim.l2_regularizer(0.0)
+        biases_regularizer = None
+        # initializer todo improve 初始化方法可以改动
+        weights_initializer = slim.xavier_initializer()
+        biase_initializer = init_ops.constant_initializer()
+        # normalization todo improve
+        normalizer = slim.batch_norm
+        normalizer_params = {"scale": True, "is_training": True}  # todo question 这里训练要添加
+        with slim.arg_scope([slim.conv2d, slim.conv2d_transpose], weights_regularizer=weights_regularizer,
+                            weights_initializer=weights_initializer, biases_regularizer=biases_regularizer):
+            with slim.arg_scope([slim.conv2d], normalizer_fn=normalizer, normalizer_params=normalizer_params) as scope:
+                return scope
+
     def _build_network(self, image):
         tf.logging.info('................>>>>>>>>>>>>>>>> building {} network'.format(self.name))
         with tf.variable_scope('UNet'):
@@ -83,6 +98,7 @@ class UNet(BaseNet):
                 self.classes[key]['metric'] = dict()
                 for name, args in self.train_metrics.items():
                     result = metrics_function.get_mertrics(name, logits, label, args['eps'])
+                    result = tf.identity(result, name=key + '_metric_' + name)
                     self.classes[key]['metric'][name] = result
 
     def _build_summary(self):
@@ -92,8 +108,7 @@ class UNet(BaseNet):
                          collections=[CustomKeys.SUMMARIES])
         labels = tf.expand_dims(self.label, axis=-1)
         labels_uint8 = tf.cast(labels * 255 / len(self.classes), tf.uint8)
-        tf.summary.image('{}/Label'.format(self.tag), labels_uint8, max_outputs=1,
-                         collections=[CustomKeys.SUMMARIES])
+        tf.summary.image('{}/Label'.format(self.tag), labels_uint8, max_outputs=1, collections=[CustomKeys.SUMMARIES])
         for key, value in self.classes.items():
             tf.summary.image('{}/Prediction/{}'.format(self.tag, key), value['prediction'] * 255, max_outputs=1,
                              collections=[CustomKeys.SUMMARIES])

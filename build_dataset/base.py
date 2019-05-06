@@ -123,8 +123,7 @@ class BaseDataset:
                 output_path = record_fold / '{}-{}-of-{}.tfrecord'.format(example_name, i + 1, self.k)
                 with tf.io.TFRecordWriter(str(output_path)) as example_writer:
                     example = example_tools.create_example(example_name, writer=example_writer,
-                                                           image_tool=self._image_tool,
-                                                           label_tool=self._label_tool)
+                                                           image_tool=self._image_tool, label_tool=self._label_tool)
                     example.write_example(i, fold)
                 dataset.append(output_path)
                 max_fold_size = max(max_fold_size, len(fold))
