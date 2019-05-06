@@ -41,6 +41,5 @@ class TwoDExample(BaseExample):
                 label = tf.reshape(label, features['segmentation/shape'])
                 label = tf.to_int32(label)
                 label = tf.clip_by_value(label, 0, 1)  # todo improve test该进
-
             return_feature = {'image': image, 'name': features['image/name'], 'index': features['extra/index']}
             return return_feature, label

@@ -32,7 +32,8 @@ class TrainMode(BaseMode):
             with tf.variable_scope('UnitedImageSize'):
                 # image = self.adjust_window_size(feature['image'], params['min_window_level'],
                 #                                 params['max_window_level']) todo test
-                image = image_process_operations.resize_image(feature['image'], params['image_height'], params['image_width'])
+                image = image_process_operations.resize_image(feature['image'], params['image_height'],
+                                                              params['image_width'])
 
                 feature['image'] = tf.squeeze(image, axis=0)
             with tf.variable_scope('UnitedLabelSize'):
@@ -67,7 +68,6 @@ class TrainMode(BaseMode):
         return None
 
     def adjust_window_size(self, image, min_window, max_window):
-        #
         min_window_tensor = tf.random_uniform([], -50, 50)
         max_window_tensor = tf.random_uniform([], -50, 50)
         new_min_window = tf.add(float(min_window), min_window_tensor, name='min_window')

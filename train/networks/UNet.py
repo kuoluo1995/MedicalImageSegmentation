@@ -105,9 +105,9 @@ class UNet(BaseNet):
         # todo improve 未来考虑多通道 ,并且把summary统一起
         tf.summary.image('{}/Image'.format(self.tag), self.image, max_outputs=1,
                          collections=[CustomKeys.SUMMARIES])
-        labels = tf.expand_dims(self.label, axis=-1)
-        labels_uint8 = tf.cast(labels * 255 / len(self.classes), tf.uint8)
-        tf.summary.image('{}/Label'.format(self.tag), labels_uint8, max_outputs=1, collections=[CustomKeys.SUMMARIES])
+        label = tf.expand_dims(self.label, axis=-1)
+        label_uint8 = tf.cast(label * 255 / len(self.classes), tf.uint8)
+        tf.summary.image('{}/Label'.format(self.tag), label_uint8, max_outputs=1, collections=[CustomKeys.SUMMARIES])
         for key, value in self.classes.items():
             tf.summary.image('{}/Prediction/{}'.format(self.tag, key), value['prediction'] * 255, max_outputs=1,
                              collections=[CustomKeys.SUMMARIES])
