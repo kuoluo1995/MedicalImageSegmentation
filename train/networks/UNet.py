@@ -97,8 +97,7 @@ class UNet(BaseNet):
                 label = self.classes[key]['label']
                 self.classes[key]['metric'] = dict()
                 for name, args in self.train_metrics.items():
-                    result = metrics_function.get_mertrics(name, logits, label, args['eps'])
-                    result = tf.identity(result, name=key + '_metric_' + name)
+                    result = metrics_function.get_mertrics(name, logits, label, args['eps'], key + '_metric_' + name)
                     self.classes[key]['metric'][name] = result
 
     def _build_summary(self):

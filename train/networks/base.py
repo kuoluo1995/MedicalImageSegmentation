@@ -83,7 +83,7 @@ class BaseNet:
 
     def _build_label(self, label):
         tf.logging.info('................>>>>>>>>>>>>>>>> building label')
-        label.set_shape([self.batch_size, None, None])
+        label.set_shape([self.batch_size, self.height, self.width])
         with tf.variable_scope("LabelProcess"):
             one_hot_label = tf.one_hot(label, len(self.classes))
             class_labels = tf.split(one_hot_label, len(self.classes), axis=-1)

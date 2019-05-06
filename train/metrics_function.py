@@ -3,8 +3,8 @@ import tensorflow as tf
 from train.config import CustomKeys
 
 
-def get_mertrics(mertrics_name, logits, labels, eps):
-    return eval(mertrics_name)(logits, labels, eps)
+def get_mertrics(mertrics_name, logits, labels, eps, name):
+    return eval(mertrics_name)(logits, labels, eps, name)
 
 
 def get_total_mertrics():
@@ -12,11 +12,11 @@ def get_total_mertrics():
         yield metric
 
 
-def dice(logits, labels, eps):
+def dice(logits, labels, eps, name):
     eps = float(eps)
     dim = len(logits.get_shape())
     sum_axis = list(range(1, dim))
-    with tf.variable_scope('Dice', [logits, labels, eps]):
+    with tf.variable_scope(name, [logits, labels, eps]):
         logits = tf.cast(logits, tf.float32)
         labels = tf.cast(labels, tf.float32)
 

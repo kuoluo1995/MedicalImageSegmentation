@@ -69,7 +69,6 @@ class BestCheckpointSaverHook(SessionRunHook):
 
     def _evaluate(self, session, step):
         results = self.evaluator.evaluate_with_session(session)
-
         if not self._better_result or self.evaluator.compare(results, self._better_result):
             self._better_result = results
             self._need_save = True
