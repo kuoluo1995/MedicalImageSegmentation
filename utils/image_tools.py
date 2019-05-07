@@ -49,3 +49,6 @@ class ImageTool(object):
 
     def transpose(self, dims):
         self._decode = self._decode.transpose(dims)
+
+    def flipud(self):
+        self._decode = np.flipud(self._decode)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" exclude=".svn;.cvs;.idea;.DS_Store;.git;.hg;*.hprof;*.pyc;dataset;_model_dir;logs;.pytest_cache">
+  <component name="PublishConfigData" autoUpload="Always" serverName="Harvard" exclude=".svn;.cvs;.idea;.DS_Store;.git;.hg;*.hprof;*.pyc;dataset;_model_dir;logs;.pytest_cache">
     <serverData>
       <paths name="Harvard">
         <serverdata>
@@ -11,5 +11,6 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>
