@@ -4,6 +4,7 @@ _model_dir
 dataset
 logs
 .idea
+*/.pytest_cache
 # 代码
 test.py
 build_dataset/__pycache__/

@@ -37,7 +37,7 @@ class TrainMode(BaseMode):
 
                 feature['image'] = tf.squeeze(image, axis=0)
             with tf.variable_scope('UnitedLabelSize'):
-                # label = tf.clip_by_value(label, 0, 1)
+                label = tf.clip_by_value(label, 0, 1)
                 label = tf.image.resize_nearest_neighbor(tf.expand_dims(tf.expand_dims(label, axis=0), axis=-1),
                                                          [params['image_height'], params['image_width']])
                 label = tf.squeeze(label, axis=(0, -1))

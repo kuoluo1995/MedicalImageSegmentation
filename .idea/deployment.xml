@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" exclude=".svn;.cvs;.idea;.DS_Store;.git;.hg;*.hprof;*.pyc;dataset;_model_dir;logs;.pytest_cache">
     <serverData>
       <paths name="Harvard">
         <serverdata>

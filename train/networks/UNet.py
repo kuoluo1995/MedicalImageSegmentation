@@ -100,13 +100,13 @@ class UNet(BaseNet):
                     result = metrics_function.get_mertrics(name, logits, label, args['eps'], key + '_metric_' + name)
                     self.classes[key]['metric'][name] = result
 
-    def _build_summary(self):
+    def _build_summary(self, label):
         tf.logging.info('................>>>>>>>>>>>>>>>> building summary')
         # todo improve 未来考虑多通道 ,并且把summary统一起
-        tf.summary.image('{}/Image'.format(self.tag), self.image, max_outputs=1,
-                         collections=[CustomKeys.SUMMARIES])
-        label = tf.expand_dims(self.label, axis=-1)
-        label_uint8 = tf.cast(label * 255 / len(self.classes), tf.uint8)
+        tf.summary.image('{}/Image'.format(self.tag), self.image, max_outputs=1, collections=[CustomKeys.SUMMARIES])
+        label = tf.expand_dims(label, axis=-1)
+        with tf.control_dependencies([tf.print(label)]):
+            label_uint8 = tf.cast(label * 255 / (len(self.classes) - 1), tf.uint8)
         tf.summary.image('{}/Label'.format(self.tag), label_uint8, max_outputs=1, collections=[CustomKeys.SUMMARIES])
         for key, value in self.classes.items():
             tf.summary.image('{}/Prediction/{}'.format(self.tag, key), value['prediction'] * 255, max_outputs=1,

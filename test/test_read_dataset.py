@@ -19,6 +19,7 @@ def print_data(image, label):
             plt.imshow(print_label)  # 显示图片
             plt.axis('off')  # 不显示坐标轴
             plt.show()
+            print(11)
         coord.request_stop()
         coord.join(threads)
 
@@ -52,13 +53,19 @@ def read_tfrecord(num_samples=26, num_classes=2):
     image = tf.decode_raw(image, tf.int16)
     image = tf.reshape(image, image_shape)
     image = tf.to_float(image)
+    image = tf.image.resize_bilinear(tf.expand_dims(image, axis=0), [512, 128])
+    image = tf.squeeze(image, axis=0)
+
     label = tf.decode_raw(label, tf.uint8)
     label = tf.reshape(label, label_shape)
     label = tf.to_int32(label)
+    label = tf.clip_by_value(label, 0, 1)
+    label = tf.image.resize_nearest_neighbor(tf.expand_dims(tf.expand_dims(label, axis=0), axis=-1), [512, 128])
+    label = tf.squeeze(label, axis=(0, -1))
+    label = tf.cast(label * 255 / 2, tf.uint8)
     return image, label
+
 
 def test():
     image, label = read_tfrecord()
     print_data(image, label)
-
-

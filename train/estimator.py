@@ -90,7 +90,7 @@ class MyEstimator(object):
             ) as session:
                 self._feed_dict[self.handler] = self.mode_dict['TrainMode'].handler
                 while not session.should_stop():
-                    _, loss = session.run([model.train_op, model.loss], self._feed_dict)
+                    _, loss= session.run([model.train_op, model.loss], self._feed_dict)
 
     def _set_modes(self, params):
         tf.logging.info('>>>>>>>>>>>>>>>>>>>> setting modes')

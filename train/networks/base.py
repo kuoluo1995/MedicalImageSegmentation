@@ -1,3 +1,4 @@
+import copy
 import tensorflow as tf
 from abc import abstractmethod
 from tensorflow.contrib import slim
@@ -60,7 +61,7 @@ class BaseNet:
         pass
 
     @abstractmethod
-    def _build_summary(self):
+    def _build_summary(self, label):
         pass
 
     def build_model(self, feature, label):
@@ -71,9 +72,9 @@ class BaseNet:
         with slim.arg_scope(self._net_args_scope()):
             self._logits = self._build_network(self.image)
             self._build_prediction(self._logits)
-        loss = self._build_loss(self._logits, self.label)
+        loss = self._build_loss(self._logits, label)
         self._build_metrics()
-        self._build_summary()
+        self._build_summary(label)
         return loss
 
     def _build_image(self, image):
@@ -83,7 +84,7 @@ class BaseNet:
 
     def _build_label(self, label):
         tf.logging.info('................>>>>>>>>>>>>>>>> building label')
-        label.set_shape([self.batch_size, self.height, self.width])
+        label.set_shape([self.batch_size, None, None])
         with tf.variable_scope("LabelProcess"):
             one_hot_label = tf.one_hot(label, len(self.classes))
             class_labels = tf.split(one_hot_label, len(self.classes), axis=-1)
