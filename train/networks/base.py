@@ -1,6 +1,8 @@
+import copy
 import tensorflow as tf
 from abc import abstractmethod
 from tensorflow.contrib import slim
+from tensorflow.python.ops import init_ops
 from train import loss_function
 from train import metrics_function
 from train.config import CustomKeys
@@ -39,6 +41,10 @@ class BaseNet:
         pass
 
     @abstractmethod
+    def _net_args_scope(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
     def _build_network(self, image):
         pass
 
@@ -55,7 +61,7 @@ class BaseNet:
         pass
 
     @abstractmethod
-    def _build_summary(self):
+    def _build_summary(self, label):
         pass
 
     def build_model(self, feature, label):
@@ -63,11 +69,12 @@ class BaseNet:
         self.feature = feature  # todo improve 这里未来feature可以传递过来更多有用的信息一起帮助训练
         self.image = self._build_image(feature['image'])
         self.label = self._build_label(label)
-        self._logits = self._build_network(self.image)
-        self._build_prediction(self._logits)
-        loss = self._build_loss(self._logits, self.label)
+        with slim.arg_scope(self._net_args_scope()):
+            self._logits = self._build_network(self.image)
+            self._build_prediction(self._logits)
+        loss = self._build_loss(self._logits, label)
         self._build_metrics()
-        self._build_summary()
+        self._build_summary(label)
         return loss
 
     def _build_image(self, image):

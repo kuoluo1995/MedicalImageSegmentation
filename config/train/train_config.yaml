@@ -28,8 +28,8 @@ dataset:
   image_augmentation:
     random_zoom_in:
       max_scale: 1.5
-    random_noise:
-      scale: 0.05
+#    random_noise:
+#      scale: 0.05
     random_horizontally_flip: None
 
 model:

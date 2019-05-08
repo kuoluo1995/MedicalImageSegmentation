@@ -46,4 +46,5 @@ class BaseExample:
 
     @abstractmethod
     def read_example(self, example_proto, mode, **params):
+
         pass

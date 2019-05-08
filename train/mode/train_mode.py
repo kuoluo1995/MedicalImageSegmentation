@@ -30,16 +30,16 @@ class TrainMode(BaseMode):
                         label = new_label
 
             with tf.variable_scope('UnitedImageSize'):
-                image = self.adjust_window_size(feature['image'], params['min_window_level'], params['max_window_level'])
-                image = image_process_operations.resize_image(image, params['image_height'],
+                image = image_process_operations.resize_image(feature['image'], params['image_height'],
                                                               params['image_width'])
-
+                image = self.adjust_window_size(image, params['min_window_level'],
+                                                params['max_window_level'])
                 feature['image'] = tf.squeeze(image, axis=0)
             with tf.variable_scope('UnitedLabelSize'):
-                label = tf.clip_by_value(label, 0, 1)
                 label = tf.image.resize_nearest_neighbor(tf.expand_dims(tf.expand_dims(label, axis=0), axis=-1),
                                                          [params['image_height'], params['image_width']])
                 label = tf.squeeze(label, axis=(0, -1))
+                label = tf.clip_by_value(label, 0, 1)
             return feature, label
 
         with tf.variable_scope('TrainDataset'):
@@ -67,7 +67,6 @@ class TrainMode(BaseMode):
         return None
 
     def adjust_window_size(self, image, min_window, max_window):
-        #
         min_window_tensor = tf.random_uniform([], -50, 50)
         max_window_tensor = tf.random_uniform([], -50, 50)
         new_min_window = tf.add(float(min_window), min_window_tensor, name='min_window')

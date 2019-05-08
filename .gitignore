@@ -4,6 +4,7 @@ _model_dir
 dataset
 logs
 .idea
+*/.pytest_cache
 # 代码
 test.py
 build_dataset/__pycache__/
@@ -15,3 +16,4 @@ train/networks/__pycache__/
 train/solver/__pycache__/
 utils/__pycache__/
 utils/example_tools/__pycache__/
+utils/reader_tools/__pycache__/

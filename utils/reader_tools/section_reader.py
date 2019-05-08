@@ -54,3 +54,13 @@ class ImageReader:
 
     def transpose(self, dims):
         self._decode = self._decode.transpose(dims)
+
+    def flipud(self):
+        self._decode = np.flipud(self._decode)
+
+    def extract_region(self, align, padding, min_bbox_shape=None):
+        mask = np.asarray(self._decode, np.bool)
+        ndim = mask.ndim
+        align = np.array(align, dtype=np.int32)
+
+        pass

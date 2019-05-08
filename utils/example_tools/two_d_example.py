@@ -5,7 +5,9 @@ class TwoDExample(BaseExample):
     name = 'twoD'
 
     def _create_example_format(self, image_channel):
+        self.image_tool.flipud()
         self.image_tool.transpose((1, 0, 2))
+        self.label_tool.flipud()
         self.label_tool.transpose((1, 0, 2))
         for idx in range(self.image_tool.shape[0]):
             image, image_shape = self.image_tool.get_data_and_shape(idx, image_channel)
@@ -40,8 +42,5 @@ class TwoDExample(BaseExample):
                 label = tf.decode_raw(features['segmentation/encoded'], tf.uint8)
                 label = tf.reshape(label, features['segmentation/shape'])
                 label = tf.to_int32(label)
-
             return_feature = {'image': image, 'name': features['image/name'], 'index': features['extra/index']}
-            # with tf.control_dependencies(
-            #         [tf.print('\r>> index:', return_feature['index'], '#shape:', tf.shape(label))]):
             return return_feature, label

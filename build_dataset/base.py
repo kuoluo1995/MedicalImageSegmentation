@@ -6,9 +6,7 @@ from tensorflow.python.data import Iterator
 from tensorflow.python.framework import dtypes, ops
 from tensorflow.python.ops import array_ops
 from pathlib import Path
-
-from utils import example_tools, yaml_tools
-from utils.reader_tools.reader_section import ImageReader
+from utils import example_tools, reader_tools, yaml_tools
 
 
 def _get_records(records):
@@ -30,8 +28,8 @@ class BaseDataset:
     seed = None
     _k_folds_record = None
 
-    _image_tool = ImageReader(np.int16, is_label=False)
-    _label_tool = ImageReader(np.uint8, is_label=True)  # use uint8 to save space
+    _image_tool = None
+    _label_tool = None
     _examples = None
 
     batch_size = None
@@ -40,7 +38,7 @@ class BaseDataset:
     max_window_level = None
     image_height = None
     image_width = None
-    image_channel = 1  # todo improve 改善图像通道的生成方式 一般是灰度，所以先是1
+    image_channel = None
     num_parallel_batches = None
 
     image_augmentation_dict = None
@@ -113,8 +111,7 @@ class BaseDataset:
 
         # 保存成example
         record_fold = self._output_data_path / 'records'
-        if not record_fold.exists():
-            record_fold.mkdir(parents=True, exist_ok=True)
+        record_fold.mkdir(parents=True, exist_ok=True)
         for example_name in self._examples:
             dataset = list()
             max_fold_size = 0

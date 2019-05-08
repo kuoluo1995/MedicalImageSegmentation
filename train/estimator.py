@@ -87,7 +87,6 @@ class MyEstimator(object):
     def train(self):
         tf.logging.info('>>>>>>>>>>>>>>>>>>>> building input pipeline')
         feature, label, input_hooks, self.handler = self._get_input_pipeline()
-
         tf.logging.info('>>>>>>>>>>>>>>>>>>>> building model')
         model = self._get_model(feature, label)
 

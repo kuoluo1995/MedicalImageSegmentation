@@ -1,4 +1,4 @@
-from utils.reader_tools.reader_section import *
+from utils.reader_tools.section_reader import *
 
 
 class VolumeReader(ImageReader):

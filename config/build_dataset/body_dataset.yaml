@@ -5,6 +5,7 @@ dataset:
 
   source_data:
     path: 'E:/Slimed_NF' #'/home/yf/Slimed_NF'
+    reader_tools: 'VolumeReader'
     extra:
       image_pattern: 'STIR.mhd' # 用来过滤文件，获取正确文件的
       label_pattern: 'STIR_Label.mhd'
