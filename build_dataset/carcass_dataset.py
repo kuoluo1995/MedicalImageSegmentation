@@ -1,8 +1,8 @@
 from build_dataset.base import *
 
 
-class BodyDataset(BaseDataset):
-    name = 'Body'
+class CarcassDataset(BaseDataset):
+    name = 'Carcass'
     _image_pattern = None
 
     # *************************************************创建时用的函数************************************************* #
@@ -12,7 +12,6 @@ class BodyDataset(BaseDataset):
         self._output_data_path = Path(__file__).parent.parent / 'dataset' / dataset_config['name']
         self._output_data_path.mkdir(parents=True, exist_ok=True)
         self.train_scale = dataset_config['output_data']['train_scale']
-        self._image_pattern = dataset_config['source_data']['extra']['image_pattern']
         self.seed = params['random_seed']
         self.k = dataset_config['output_data']['k']
         self._k_folds_record = self._output_data_path / '_k_folds_record.yaml'  # 固定值，内部文件
@@ -20,10 +19,9 @@ class BodyDataset(BaseDataset):
         tf.logging.info('set completed {} dataset config'.format(self.name))
 
     def _get_source_data(self):
-        image_data = list(self._source_data_path.rglob(self._image_pattern))
-        source_data = [
-            {'image': str(source), 'label': str(source).replace('STIR.mhd', 'STIR-label.mhd')}
-            for source in image_data]
+        source_data = list()
+        for fold in self._source_data_path.iterdir():
+            source_data.append({'image': str(fold) + '/image.nii', 'label': str(fold) + '/label.nii'})
         return source_data
 
     # *************************************************训练时用的函数************************************************* #

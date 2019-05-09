@@ -1,0 +1,27 @@
+random_seed: 1234
+
+dataset:
+  name: 'CarcassDataset'
+
+  source_data:
+    path: 'E:/Corpus_Callosum' #'E:/Slimed_NF'
+    extra:
+
+  output_data:
+    data_record: 'records' # tfrecord数据存放位置
+    k: 5 # 分成k份文件
+    train_scale: 0.8
+
+  examples:
+    value:
+      - 'TwoDExample'
+    description: '创建tf_example的策略'
+
+  extra:
+    value: None
+    description: '额外可能需要用的参数'
+
+
+
+
+
