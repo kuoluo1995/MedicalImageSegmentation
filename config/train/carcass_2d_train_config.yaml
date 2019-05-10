@@ -1,0 +1,87 @@
+tag: 'carcass_twod_unet' # 这次训练的名称
+CUDA_VISIBLE_DEVICES: '1'
+random_seed: 1234
+batch_size: 4
+
+estimator:
+  num_steps: 400000
+  save_summary_steps: 200
+  save_checkpoints_steps: 5000
+  keep_checkpoint_max: 1
+  log_step_count_steps: 500
+  allow_soft_placement: true
+  gpu_options_allow_growth: true
+  save_best_checkpoint: true
+
+dataset:
+  name: 'CarcassDataset'
+  modes: # 这里包含了具体几个模式的信息
+    TrainOrganMode:
+      dataset_path: 'E:/Slimed_NF'
+
+    EvalMode:
+      dataset_path: 'eval_TwoDExample.yaml'
+  min_window_level: 0
+  max_window_level: 2000
+  image_height: 256
+  image_width: 256
+  num_parallel_batches: 1
+  image_augmentation:
+    random_zoom_in:
+      max_scale: 1.5
+#    random_noise:
+#      scale: 0.05
+    random_horizontally_flip: None
+
+model:
+  model_dir: '_model_dir'
+  #  checkpoint: 'checkpoint_best'
+  networks:
+    UNet:
+      init_channels: 64
+      classes:
+        background:
+          weight: 0.2
+        body:
+          weight: 0.1
+      loss_name: 'weighted_sparse_softmax_cross_entropy'
+      train_metrics:
+        dice:
+          eps: 1e-5
+      num_down_samples: 4
+
+  solver:
+    slow_start_step: 0
+    slow_start_learning_rate: 1e-4
+    learning_rate:
+      name: 'piecewise_constant'
+      boundaries:
+        - 200000
+        - 300000 # learning_rate_decay_boundaries
+      values:
+        - 0.003
+        - 0.0003
+        - 0.0001 # learning_rate_custom_values
+    optimizer:
+      name: 'adam'
+      beta1: 0.9 # 参数什么意思
+      beta2: 0.99
+
+  evaluator:
+    name: 'SliceEvaluator'
+    eval_steps:  2500
+    metric_list:
+      - 'dice'
+
+hooks:
+# 默认含有的hooks
+# util._DatasetInitializerHook
+# StopAtStepHook
+# NanTensorHook
+# LoggingTensorHook
+# IteratorStringHandleHook:
+# LogLearningRateHook:
+
+
+
+

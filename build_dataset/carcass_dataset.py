@@ -3,7 +3,6 @@ from build_dataset.base import *
 
 class CarcassDataset(BaseDataset):
     name = 'Carcass'
-    _image_pattern = None
 
     # *************************************************创建时用的函数************************************************* #
     def set_build_config(self, params):
@@ -23,6 +22,10 @@ class CarcassDataset(BaseDataset):
         for fold in self._source_data_path.iterdir():
             source_data.append({'image': str(fold) + '/image.nii', 'label': str(fold) + '/label.nii'})
         return source_data
+
+    @staticmethod
+    def deal_image(image_reader):
+        return image_reader
 
     # *************************************************训练时用的函数************************************************* #
     def set_train_config(self, **param):

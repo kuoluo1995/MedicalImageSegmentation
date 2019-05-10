@@ -1,11 +1,10 @@
 import numpy as np
 
 from pathlib import Path
-from utils.mhd_tools import *
+from utils import reader_tools
 
 
-class ImageTool(object):
-    name = None
+class ImageReader:
     image_path = None
     format = None
     _type = None
@@ -32,7 +31,7 @@ class ImageTool(object):
             raise ValueError("No supple idx_format: idx_format ({})".format(i))
 
         if self._decode is None:
-            raise ValueError("No data: file_name ({})".format(self.name))
+            raise ValueError("No data: file_name ({})".format(self.image_path))
         image = to_image(idx)
         if not self._is_label:
             image = image[..., np.newaxis]
@@ -40,12 +39,14 @@ class ImageTool(object):
         return image.tobytes(), image.shape
 
     def read(self, image_file):
-        self.name = Path(image_file).stem
         self.image_path = str(image_file)
         self.format = Path(image_file).suffix[1:]
-        self._reader = eval(self.format + '_reader')
-        self._writer = eval(self.format + '_writer')
-        self._decode = self._reader(image_file).astype(self._type, copy=False)
+        self._reader = eval('reader_tools.' + self.format + '_reader')
+        self._writer = eval('reader_tools.' + self.format + '_writer')
+        self._decode = self._reader(image_file)
+        if self._decode.dtype == float:
+            self._decode += 0.5
+        self._decode = self._decode.astype(self._type, copy=False)
 
     def transpose(self, dims):
         self._decode = self._decode.transpose(dims)

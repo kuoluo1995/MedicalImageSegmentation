@@ -24,8 +24,9 @@ def feature_to_bytes_list(source_value):
 class BaseExample:
     name = None
     writer = None
-    image_tool = None
-    label_tool = None
+    image_reader = None
+    label_reader = None
+    dataset_class = None
 
     @abstractmethod
     def _create_example_format(self):
@@ -34,12 +35,12 @@ class BaseExample:
     def write_example(self, i, fold):
         for j, data in enumerate(fold):
             print("Converting {}: fold {}, {}/{}".format(str(self.__class__), i + 1, j + 1, len(fold)))
-            self.image_tool.read(data['image'])
-            self.label_tool.read(data['label'])
+            self.image_reader.read(data['image'])
+            self.label_reader.read(data['label'])
 
-            if self.image_tool.shape != self.label_tool.shape:
+            if self.image_reader.shape != self.label_reader.shape:
                 raise RuntimeError("Shape mismatched between image and label: {} vs {},image_path:{} ".format(
-                    self.image_tool.shape, self.label_tool.shape, self.image_tool.image_path))
+                    self.image_reader.shape, self.label_reader.shape, self.image_reader.image_path))
 
             for example in self._create_example_format():
                 self.writer.write(example.SerializeToString())

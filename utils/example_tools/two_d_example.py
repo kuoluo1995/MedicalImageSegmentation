@@ -5,15 +5,13 @@ class TwoDExample(BaseExample):
     name = 'twoD'
 
     def _create_example_format(self):
-        self.image_tool.flipud()
-        self.image_tool.transpose((1, 0, 2))
-        self.label_tool.flipud()
-        self.label_tool.transpose((1, 0, 2))
-        for idx in range(self.image_tool.shape[0]):
-            image, image_shape = self.image_tool.get_data_and_shape(idx)
-            label, label_shape = self.label_tool.get_data_and_shape(idx)
+        self.dataset_class.deal_image(self.image_reader)
+        self.dataset_class.deal_image(self.label_reader)
+        for idx in range(self.image_reader.shape[0]):
+            image, image_shape = self.image_reader.get_data_and_shape(idx)
+            label, label_shape = self.label_reader.get_data_and_shape(idx)
             feature = {
-                'image/name': feature_to_bytes_list(self.image_tool.name),
+                'image/name': feature_to_bytes_list(self.image_reader.image_path),
                 'image/shape': feature_to_int64_list(image_shape),
                 'image/encoded': feature_to_bytes_list(image),
                 'segmentation/shape': feature_to_int64_list(label_shape),

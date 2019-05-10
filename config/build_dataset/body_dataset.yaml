@@ -4,7 +4,7 @@ dataset:
   name: 'BodyDataset'
 
   source_data:
-    path: '/home/yf/Slimed_NF' #'E:/Slimed_NF'
+    path: 'E:/Slimed_NF' #''
     extra:
       image_pattern: 'STIR.mhd' # 用来过滤文件，获取正确文件的
       label_pattern: 'STIR_Label.mhd'
@@ -17,11 +17,9 @@ dataset:
   examples:
     value:
       - 'TwoDExample'
-    description: '创建tf_example的策略'
 
   extra:
     value: None
-    description: '额外可能需要用的参数'
 
 
 

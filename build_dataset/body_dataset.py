@@ -22,9 +22,15 @@ class BodyDataset(BaseDataset):
     def _get_source_data(self):
         image_data = list(self._source_data_path.rglob(self._image_pattern))
         source_data = [
-            {'image': str(source), 'label': str(source).replace('STIR.mhd', 'STIR-label.mhd')}
+            {'image': str(source).replace('stir', 'STIR'), 'label': str(source).replace('stir', 'STIR-label')}
             for source in image_data]
         return source_data
+
+    @staticmethod
+    def deal_image(image_reader):
+        image_reader.flipud()
+        image_reader.transpose((1, 0, 2))
+        return image_reader
 
     # *************************************************训练时用的函数************************************************* #
     def set_train_config(self, **param):

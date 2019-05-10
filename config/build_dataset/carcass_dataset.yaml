@@ -4,7 +4,7 @@ dataset:
   name: 'CarcassDataset'
 
   source_data:
-    path: 'E:/Corpus_Callosum' #'E:/Slimed_NF'
+    path: 'E:/Corpus_Callosum' #''
     extra:
 
   output_data:
@@ -15,11 +15,9 @@ dataset:
   examples:
     value:
       - 'TwoDExample'
-    description: '创建tf_example的策略'
 
   extra:
     value: None
-    description: '额外可能需要用的参数'
 
 
 
