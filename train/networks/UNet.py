@@ -11,11 +11,8 @@ class UNet(BaseNet):
         # 必填参数
         self.tag = params['tag']
         self.init_channels = params['init_channels']
-
-        self.height = params['image_height']
-        self.width = params['image_width']
+        self.is_training = params['is_training']
         self.batch_size = params['batch_size']
-        self.channel = params['image_channel']
 
         self.classes = params['classes']
 
@@ -33,7 +30,7 @@ class UNet(BaseNet):
         biase_initializer = init_ops.constant_initializer()
         # normalization todo improve
         normalizer = slim.batch_norm
-        normalizer_params = {"scale": True, "is_training": True}  # todo question 这里训练要添加
+        normalizer_params = {"scale": True, "is_training": self.is_training}
         with slim.arg_scope([slim.conv2d, slim.conv2d_transpose], weights_regularizer=weights_regularizer,
                             weights_initializer=weights_initializer, biases_regularizer=biases_regularizer):
             with slim.arg_scope([slim.conv2d], normalizer_fn=normalizer, normalizer_params=normalizer_params) as scope:
@@ -79,7 +76,9 @@ class UNet(BaseNet):
             zeros = tf.zeros_like(classes_logits[0], dtype=tf.uint8)
             ones = tf.ones_like(zeros, dtype=tf.uint8)
             for i, key in enumerate(self.classes):
-                self.classes[key]['prediction'] = tf.where(classes_logits[i] > 0.5, ones, zeros, name=key + '_predict')
+                if self.classes[key]['show']:
+                    self.classes[key][CustomKeys.PREDICTION] = tf.where(classes_logits[i] > 0.5, ones, zeros,
+                                                                        name=key + '_prediction')
 
     def _build_loss(self, logits, label):
         tf.logging.info('................>>>>>>>>>>>>>>>> building loss')
@@ -92,25 +91,31 @@ class UNet(BaseNet):
     def _build_metrics(self):
         tf.logging.info('................>>>>>>>>>>>>>>>> building metrics')
         with tf.variable_scope('Metrics'):
-            for i, key in enumerate(self.classes):
-                logits = self.classes[key]['prediction']
-                label = self.classes[key]['label']
-                self.classes[key]['metric'] = dict()
-                for name, args in self.train_metrics.items():
-                    result = metrics_function.get_mertrics(name, logits, label, args['eps'], key + '_metric_' + name)
-                    self.classes[key]['metric'][name] = result
+            for key, value in self.classes.items():
+                if value['show']:
+                    logits = self.classes[key][CustomKeys.PREDICTION]
+                    label = self.classes[key][CustomKeys.LABEL]
+                    self.classes[key][CustomKeys.METRICS] = dict()
+                    for name, args in self.train_metrics.items():
+                        result = metrics_function.get_mertrics(name, logits, label, args['eps'],
+                                                               key + '_metric_' + name)
+                        self.classes[key][CustomKeys.METRICS][name] = result
 
     def _build_summary(self, label):
         tf.logging.info('................>>>>>>>>>>>>>>>> building summary')
         # todo improve 未来考虑多通道 ,并且把summary统一起
-        tf.summary.image('{}/Image'.format(self.tag), self.image, max_outputs=1, collections=[CustomKeys.SUMMARIES])
+        image_channel = self.image.get_shape().as_list()[-1]
+        image = self.image[..., (image_channel - 1) // 2:(image_channel + 1) // 2]  # todo test 多维度思考
+        tf.summary.image('{}/Image'.format(self.tag), image, max_outputs=1, collections=[CustomKeys.SUMMARIES])
         label = tf.expand_dims(label, axis=-1)
         label_uint8 = tf.cast(label * 255 / len(self.classes), tf.uint8)
         tf.summary.image('{}/Label'.format(self.tag), label_uint8, max_outputs=1, collections=[CustomKeys.SUMMARIES])
         for key, value in self.classes.items():
-            tf.summary.image('{}/Prediction/{}'.format(self.tag, key), value['prediction'] * 255, max_outputs=1,
-                             collections=[CustomKeys.SUMMARIES])
-        for loss in loss_function.get_total_loss():
-            tf.summary.scalar('{}/{}'.format(self.tag, loss.op.name), loss, collections=[CustomKeys.SUMMARIES])
+            if value['show']:
+                tf.summary.image('{}/Prediction/{}'.format(self.tag, key), value[CustomKeys.PREDICTION] * 255,
+                                 max_outputs=1, collections=[CustomKeys.SUMMARIES])
+        if self.is_training:
+            for loss in loss_function.get_total_loss():
+                tf.summary.scalar('{}/{}'.format(self.tag, loss.op.name), loss, collections=[CustomKeys.SUMMARIES])
         for metrics in metrics_function.get_total_mertrics():
             tf.summary.scalar('{}/{}'.format(self.tag, metrics.op.name), metrics, collections=[CustomKeys.SUMMARIES])

@@ -9,11 +9,10 @@ logs
 test.py
 build_dataset/__pycache__/
 train/__pycache__/
-train/evaluators/__pycache__/
+evaluators/__pycache__/
 train/hooks/__pycache__/
 train/mode/__pycache__/
 train/networks/__pycache__/
 train/solver/__pycache__/
 utils/__pycache__/
 utils/example_tools/__pycache__/
-utils/reader_tools/__pycache__/

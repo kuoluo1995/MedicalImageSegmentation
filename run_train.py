@@ -12,7 +12,7 @@ def main():
     estimate = MyEstimator()
     config_file = open('config/train/train_config.yaml', 'rb')
     estimate_config = yaml.load(config_file)
-    config.set_logger(estimate_config['tag'])
+    config.set_logger(config.CustomKeys.TRAIN, estimate_config['tag'])
     tf.logging.info('input params:{}'.format(estimate_config))
     os.environ['CUDA_VISIBLE_DEVICES'] = estimate_config['CUDA_VISIBLE_DEVICES']
     with context.graph_mode():

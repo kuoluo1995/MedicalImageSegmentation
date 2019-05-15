@@ -14,7 +14,7 @@ from utils import yaml_tools
 
 
 class BestCheckpointSaverHook(SessionRunHook):
-    def __init__(self, tag, evaluator, checkpoint_dir, steps_pre_run, checkpoint_name='best_model.ckpt'):
+    def __init__(self, tag, evaluator, checkpoint_dir, steps_pre_run, checkpoint_name):
         self.evaluator = evaluator
         self.checkpoint_dir = checkpoint_dir
 

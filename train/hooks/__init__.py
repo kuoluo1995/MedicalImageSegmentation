@@ -5,7 +5,7 @@ from train.hooks.best_checkpoint_saver_hook import BestCheckpointSaverHook
 from train.hooks.log_learning_rate_hook import LogLearningRateHook
 
 
-def get_work_hooks(params, *hooks):
+def get_train_hooks(params, *hooks):
     work_hooks = list()
     for hook in hooks:
         if not hook:
@@ -17,9 +17,21 @@ def get_work_hooks(params, *hooks):
     work_hooks.append(LoggingTensorHook(params['tensors'], params['config'].log_step_count_steps))
     work_hooks.append(IteratorStringHandleHook(params['mode_dict']))
     work_hooks.append(
-        BestCheckpointSaverHook(params['tag'], params['evaluator'], str(params['model_dir']), params['steps_pre_run']))
+        BestCheckpointSaverHook(params['tag'], params['evaluator'], str(params['model_dir']), params['steps_pre_run'],
+                                params['checkpoint_name']))
     work_hooks.append(
         LogLearningRateHook(params['every_steps'], params['steps_pre_run'], str(params['model_dir']), params['tag']))
+    return work_hooks
+
+
+def get_eval_hooks(params, *hooks):
+    work_hooks = list()
+    for hook in hooks:
+        if not hook:
+            continue
+        if isinstance(hook, list):
+            work_hooks += hook
+    work_hooks.append(IteratorStringHandleHook(params['mode_dict']))
     return work_hooks
 
 

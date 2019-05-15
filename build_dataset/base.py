@@ -1,11 +1,12 @@
 import numpy as np
 import tensorflow as tf
 from abc import abstractmethod
-from tensorflow.python.estimator import util as estimator_util
+from tensorflow_estimator.python.estimator import util as estimator_util
 from tensorflow.python.data import Iterator
 from tensorflow.python.framework import dtypes, ops
 from tensorflow.python.ops import array_ops
 from pathlib import Path
+
 from utils import example_tools, reader_tools, yaml_tools
 
 
@@ -28,8 +29,8 @@ class BaseDataset:
     seed = None
     _k_folds_record = None
 
-    _image_tool = None
-    _label_tool = None
+    _image_reader = None
+    _label_reader = None
     _examples = None
 
     batch_size = None
@@ -118,9 +119,10 @@ class BaseDataset:
             for i, fold in enumerate(k_folds):
                 output_path = record_fold / '{}-{}-of-{}.tfrecord'.format(example_name, i + 1, self.k)
                 with tf.io.TFRecordWriter(str(output_path)) as example_writer:
-                    example = example_tools.create_example(example_name, writer=example_writer,
-                                                           image_tool=self._image_tool, label_tool=self._label_tool)
-                    example.write_example(i, fold, self.image_channel)
+                    example = example_tools.create_example(example_name, writer=example_writer, dataset_class=self,
+                                                           image_reader=self._image_reader,
+                                                           label_reader=self._label_reader)
+                    example.write_example(i, fold)
                 dataset.append(output_path)
                 max_fold_size = max(max_fold_size, len(fold))
             # 把结果按比例保存成yaml文件
@@ -133,7 +135,7 @@ class BaseDataset:
 
     def get_data_iterator(self, mode_dict):
         hooks = list()
-        feature = None
+        dataset_list = list()
         with ops.device('/cpu:0'):  # todo test 带测试下。取消这个会如何？
             for key in mode_dict:
                 dataset = mode_dict[key].get_dataset(base_path=self._output_data_path, batch_size=self.batch_size,
@@ -142,16 +144,13 @@ class BaseDataset:
                                                      image_height=self.image_height, image_width=self.image_width,
                                                      seed=self.seed, num_parallel_batches=self.num_parallel_batches,
                                                      image_augmentation=self.image_augmentation_dict)
-
-                hook = mode_dict[key].init_iterator(dataset)
-                if hook is not None:
-                    hooks.append(hook)
-                if feature is None:
-                    feature = dataset
+                mode_dict[key].iterator = dataset.make_initializable_iterator()
+                hooks.append(estimator_util._DatasetInitializerHook(mode_dict[key].iterator))
+                dataset_list.append(dataset)
         # todo improve 合理的拿出feature来的方法
         with tf.variable_scope('DatasetIterator'):
             tf.logging.info('..... building dataset iterator')
-            handler = array_ops.placeholder(dtypes.string, shape=(), name='Handler')
-            iterator = Iterator.from_string_handle(handler, feature.output_types, feature.output_shapes,
-                                                   feature.output_classes)
+            handler = array_ops.placeholder(dtypes.string, shape=(), name='handler')
+            iterator = Iterator.from_string_handle(handler, dataset_list[0].output_types, dataset_list[0].output_shapes,
+                                                   dataset_list[0].output_classes)
         return estimator_util.parse_iterator_result(iterator.get_next()), hooks, handler

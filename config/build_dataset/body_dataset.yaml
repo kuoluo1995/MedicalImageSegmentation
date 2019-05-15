@@ -5,7 +5,7 @@ dataset:
 
   source_data:
     path: 'E:/Slimed_NF' #'/home/yf/Slimed_NF'
-    reader_tools: 'VolumeReader'
+    reader_tools: 'ImageReader'
     extra:
       image_pattern: 'STIR.mhd' # 用来过滤文件，获取正确文件的
       label_pattern: 'STIR_Label.mhd'
@@ -14,17 +14,15 @@ dataset:
     data_record: 'records' # tfrecord数据存放位置
     k: 5 # 分成k份文件
     train_scale: 0.8
-    image_channel: 1
+    image_channel: 3
 
   examples:
     value:
       - 'TwoDExample'
-#      - 'ThreeDExample'
-    description: '创建tf_example的策略'
+      - 'ThreeDExample'
 
   extra:
     value: None
-    description: '额外可能需要用的参数'
 
 
 

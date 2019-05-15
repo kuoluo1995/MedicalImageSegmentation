@@ -5,11 +5,6 @@ def process_image(function_name, **params):
     return eval(function_name)(**params)
 
 
-def resize_image(image, height, width):
-    tf.logging.info('................>>>>>>>>>>>>>>>> resize image')
-    return tf.image.resize_bilinear(tf.expand_dims(image, axis=0), [height, width])
-
-
 def adjust_window_size(image, min_window, max_window, **kwargs):
     with tf.variable_scope('AdjustWindowSize'):
         tf.logging.info('................>>>>>>>>>>>>>>>> adjust window size')
@@ -20,7 +15,7 @@ def adjust_window_size(image, min_window, max_window, **kwargs):
 
 
 def random_zoom_in(image, label, max_scale, seed, **kwargs):
-    with tf.variable_scope('RandomZoomIn', [image, max_scale]):
+    with tf.variable_scope('RandomZoomIn', [image, label, max_scale]):
         tf.logging.info('................>>>>>>>>>>>>>>>> augmentation: random zoom in')
         scale = tf.random_uniform([2], 1, max_scale, seed=seed)
         image_shape = tf.shape(image)
@@ -42,7 +37,7 @@ def random_zoom_in(image, label, max_scale, seed, **kwargs):
 
 
 def random_horizontally_flip(image, label, seed, **kwargs):
-    with tf.variable_scope('RandomHorizontallyFlip', [image]):
+    with tf.variable_scope('RandomHorizontallyFlip', [image, label]):
         tf.logging.info('................>>>>>>>>>>>>>>>> augmentation: random horizontally flip')
         label_new = tf.expand_dims(tf.cast(label, image.dtype), axis=-1)
         combined = tf.concat((image, label_new), axis=-1)

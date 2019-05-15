@@ -1,67 +1,52 @@
 tag: 'twod_unet' # 这次训练的名称
-CUDA_VISIBLE_DEVICES: '1' # ok
-random_seed: 1234 # ok
-batch_size: 4 # ok
+CUDA_VISIBLE_DEVICES: '1'
+random_seed: 1234
+batch_size: 4
 
-estimator:
-  allow_soft_placement: true # ok
-  gpu_options_allow_growth: true # ok
+evaluator:
+  name: VolumeEvaluator
+  eval_steps:  10
+  metric_list:
+    - 'Dice'
+  save_image: true
+  show_each_evaluate: true
 
 dataset:
   name: 'BodyDataset'
   modes: # 这里包含了具体几个模式的信息
-    EvalMode: # ok
-      dataset_path: 'eval_TwoDExample.yaml'
-  min_window_level: 0
-  max_window_level: 2000
+    PREDICT:
+      primary: true
+      value: EvalMode3D
+      dataset_path: 'eval_ThreeDExample.yaml'
   image_height: 512
   image_width: 128
+  min_window_level: 0
+  max_window_level: 2000
   num_parallel_batches: 1
   image_augmentation:
-    random_zoom_in:
-      max_scale: 1.5
-    random_noise:
-      scale: 0.05
-    random_horizontally_flip: None
 
-model: # ok
+estimator:
+  allow_soft_placement: true
+  gpu_options_allow_growth: true
+
+model:
   model_dir: '_model_dir'
   networks:
     UNet:
+      is_training: false
       init_channels: 64
       classes:
         background:
+          show: false
           weight: 0.2
         body:
+          show: true
           weight: 0.1
       loss_name: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
         dice:
           eps: 1e-5
-      num_down_samples: 4 # ok
-
-  solver:
-    slow_start_step: 0
-    slow_start_learning_rate: 1e-4
-    learning_rate:
-      name: 'piecewise_constant'
-      boundaries:
-        - 200000
-        - 300000 # learning_rate_decay_boundaries
-      values:
-        - 0.003
-        - 0.0003
-        - 0.0001 # learning_rate_custom_values
-    optimizer:
-      name: 'adam'
-      beta1: 0.9 # 参数什么意思
-      beta2: 0.99
-
-  evaluator: # ok
-    name: 'SliceEvaluator'
-    eval_steps:  2500 # ok
-    metric_list: # ok
-      - 'dice'
+      num_down_samples: 4
 
 
 

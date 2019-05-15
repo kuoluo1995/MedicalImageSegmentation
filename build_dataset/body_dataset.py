@@ -9,10 +9,11 @@ class BodyDataset(BaseDataset):
     def set_build_config(self, params):
         dataset_config = params['dataset']
         self._source_data_path = Path(dataset_config['source_data']['path'])
-        self._image_tool = reader_tools.create_reader(dataset_config['source_data']['reader_tools'], np.int16,
-                                                      is_label=False)
-        self._label_tool = reader_tools.create_reader(dataset_config['source_data']['reader_tools'], np.uint8,
-                                                      is_label=True)
+        self.image_channel = dataset_config['output_data']['image_channel']
+        self._image_reader = reader_tools.create_reader(dataset_config['source_data']['reader_tools'], type=np.int16,
+                                                        image_channel=self.image_channel, is_label=False)
+        self._label_reader = reader_tools.create_reader(dataset_config['source_data']['reader_tools'], type=np.uint8,
+                                                        image_channel=self.image_channel, is_label=True)
         self._output_data_path = Path(__file__).parent.parent / 'dataset' / dataset_config['name']
         self._output_data_path.mkdir(parents=True, exist_ok=True)
         self.train_scale = dataset_config['output_data']['train_scale']
@@ -20,9 +21,7 @@ class BodyDataset(BaseDataset):
         self.seed = params['random_seed']
         self.k = dataset_config['output_data']['k']
         self._k_folds_record = self._output_data_path / '_k_folds_record.yaml'  # 固定值，内部文件
-        self.image_channel = dataset_config['output_data']['image_channel']
         self._examples = dataset_config['examples']['value']
-        tf.logging.info('set completed {} dataset config'.format(self.name))
 
     def _get_source_data(self):
         image_data = list(self._source_data_path.rglob(self._image_pattern))
@@ -30,6 +29,17 @@ class BodyDataset(BaseDataset):
             {'image': str(source).replace('stir', 'STIR'), 'label': str(source).replace('stir', 'STIR-label')}
             for source in image_data]
         return source_data
+
+    @staticmethod
+    def deal_image(image_reader):
+        image_reader.flipud()
+        image_reader.transpose((1, 0, 2))
+        return image_reader
+
+    @staticmethod
+    def restore_image(image_array):
+        image_array = image_array.transpose((1, 0, 2))
+        return np.flipud(image_array)
 
     # *************************************************训练时用的函数************************************************* #
     def set_train_config(self, **param):

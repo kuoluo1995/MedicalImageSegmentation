@@ -28,9 +28,5 @@ class BaseMode:
         pass
 
     @abstractmethod
-    def init_iterator(self, dataset):
-        pass
-
-    @abstractmethod
     def adjust_window_size(self, image, min_window, max_window):
         pass

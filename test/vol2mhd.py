@@ -8,3 +8,7 @@ for image in image_data:
     os.system('E:/source_NF/VolConverter.exe 3D I ' + str(image) + ' ' + str(path) + '/STIR')
     label = str(image).replace('STIR.vol', 'STIR-label.vol')
     os.system('E:/source_NF/VolConverter.exe 3D M ' + str(label) + ' ' + str(path) + '/STIR_label')
+
+
+class T:
+    pass

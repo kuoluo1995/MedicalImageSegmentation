@@ -4,16 +4,14 @@ from utils.example_tools.base import *
 class TwoDExample(BaseExample):
     name = 'twoD'
 
-    def _create_example_format(self, image_channel):
-        self.image_tool.flipud()
-        self.image_tool.transpose((1, 0, 2))
-        self.label_tool.flipud()
-        self.label_tool.transpose((1, 0, 2))
-        for idx in range(self.image_tool.shape[0]):
-            image, image_shape = self.image_tool.get_data_and_shape(idx, image_channel)
-            label, label_shape = self.label_tool.get_data_and_shape(idx, image_channel)
+    def _create_example_format(self):
+        self.dataset_class.deal_image(self.image_reader)
+        self.dataset_class.deal_image(self.label_reader)
+        for idx in range(self.image_reader.shape[0]):
+            image, image_shape = self.image_reader.get_data_and_shape(idx)
+            label, label_shape = self.label_reader.get_data_and_shape(idx)
             feature = {
-                'image/name': feature_to_bytes_list(self.image_tool.name),
+                'image/image_path': feature_to_bytes_list(self.image_reader.image_path),
                 'image/shape': feature_to_int64_list(image_shape),
                 'image/encoded': feature_to_bytes_list(image),
                 'segmentation/shape': feature_to_int64_list(label_shape),
@@ -26,7 +24,7 @@ class TwoDExample(BaseExample):
         tf.logging.info('................>>>>>>>>>>>>>>>> reading {} example'.format(self.name))
         with tf.variable_scope('ParseExample'):
             features = {
-                'image/name': tf.FixedLenFeature([], tf.string),
+                'image/image_path': tf.FixedLenFeature([], tf.string),
                 'image/shape': tf.FixedLenFeature([3], tf.int64),
                 'image/encoded': tf.FixedLenFeature([], tf.string),
                 'segmentation/shape': tf.FixedLenFeature([2], tf.int64),
@@ -42,5 +40,5 @@ class TwoDExample(BaseExample):
                 label = tf.decode_raw(features['segmentation/encoded'], tf.uint8)
                 label = tf.reshape(label, features['segmentation/shape'])
                 label = tf.to_int32(label)
-            return_feature = {'image': image, 'name': features['image/name'], 'index': features['extra/index']}
+            return_feature = {'image': image, 'image_path': features['image/image_path']}
             return return_feature, label
