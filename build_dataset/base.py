@@ -31,6 +31,7 @@ class BaseDataset:
 
     _image_reader = None
     _label_reader = None
+
     _examples = None
 
     batch_size = None
