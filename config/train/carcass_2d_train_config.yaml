@@ -16,11 +16,14 @@ estimator:
 dataset:
   name: 'CarcassDataset'
   modes: # 这里包含了具体几个模式的信息
-    TrainOrganMode:
-      dataset_path: 'E:/Slimed_NF'
-
-    EvalMode:
-      dataset_path: 'eval_TwoDExample.yaml'
+    TRAIN:
+      primary: true
+      value: TrainMode
+      dataset_path: 'train_TwoDExample.yaml'
+    EVAL:
+      primary: false
+      value: EvalMode3D
+      dataset_path: 'eval_ThreeDExample.yaml'
   min_window_level: 0
   max_window_level: 2000
   image_height: 256
@@ -38,11 +41,14 @@ model:
   #  checkpoint: 'checkpoint_best'
   networks:
     UNet:
+      is_training: true
       init_channels: 64
       classes:
         background:
+          show: false
           weight: 0.2
         body:
+          show: true
           weight: 0.1
       loss_name: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
@@ -72,6 +78,8 @@ model:
     eval_steps:  2500
     metric_list:
       - 'dice'
+    save_image: true
+    show_each_evaluate: true
 
 hooks:
 # 默认含有的hooks

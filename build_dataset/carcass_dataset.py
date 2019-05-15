@@ -8,6 +8,11 @@ class CarcassDataset(BaseDataset):
     def set_build_config(self, params):
         dataset_config = params['dataset']
         self._source_data_path = Path(dataset_config['source_data']['path'])
+        self.image_channel = dataset_config['output_data']['image_channel']
+        self._image_reader = reader_tools.create_reader(dataset_config['source_data']['reader_tools'], type=np.int16,
+                                                        image_channel=self.image_channel, is_label=False)
+        self._label_reader = reader_tools.create_reader(dataset_config['source_data']['reader_tools'], type=np.uint8,
+                                                        image_channel=self.image_channel, is_label=True)
         self._output_data_path = Path(__file__).parent.parent / 'dataset' / dataset_config['name']
         self._output_data_path.mkdir(parents=True, exist_ok=True)
         self.train_scale = dataset_config['output_data']['train_scale']

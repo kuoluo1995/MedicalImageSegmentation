@@ -12,7 +12,7 @@ from train.config import CustomKeys
 from train.solver.solver import Solver
 
 
-class MyEstimator(object):
+class MyEstimator:
     tag = None
     handler = None
     seed = None

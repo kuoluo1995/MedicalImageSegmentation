@@ -75,7 +75,7 @@ model:
 
   evaluator:
     name: 'VolumeEvaluator'
-    eval_steps:  2000
+    eval_steps:  20
     metric_list:
       - 'Dice'
     save_image: true

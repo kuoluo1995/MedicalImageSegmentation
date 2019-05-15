@@ -5,11 +5,11 @@ import tensorflow as tf
 from abc import abstractmethod
 from tensorflow.python.framework import errors_impl
 
+import train
 from train import metrics_function
 from train.config import CustomKeys
-from train.estimator import MyEstimator
 from utils.timer import Timer
-from utils.reader_tools import ImageReader
+from utils.reader_tools import VolumeReader
 from utils.map_struct import flat_dict_convert_solid_dict
 
 

@@ -5,7 +5,7 @@ from evaluators.base import *
 
 class VolumeEvaluator(BaseEvaluate):
     name = 'volume'
-    image_reader = ImageReader()
+    image_reader = VolumeReader()
 
     def set_config(self, **params):
         tf.logging.info('..... setting {} evaluate config'.format(self.name))
@@ -99,7 +99,7 @@ class VolumeEvaluator(BaseEvaluate):
         self.metric_list = params['evaluator']['metric_list']
         self.save_image = params['evaluator']['save_image']
         self.show_each_evaluate = params['evaluator']['show_each_evaluate']
-        self.estimator = MyEstimator()
+        self.estimator = train.estimator.MyEstimator()
         params['evaluator'] = self
         self.estimator.set_eval_config(params)
         self.dataset = self.estimator.dataset
