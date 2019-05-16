@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-from train.config import CustomKeys
-from train.solver import learning_rate_funcation, optimizer_funcation
+from model_component.config import CustomKeys
+from model_component.solver import learning_rate_funcation, optimizer_funcation
 
 
 class Solver:
@@ -27,7 +27,7 @@ class Solver:
                                                                   params['optimizer'])
 
     def get_train_optimizer(self, loss):
-        tf.logging.info('................ get solver train optimizer')
+        tf.logging.info('................ get solver model_component optimizer')
         with tf.variable_scope('Optimizer'):
             update_ops = tf.get_collection(CustomKeys.UPDATE_OPS)
             if update_ops:

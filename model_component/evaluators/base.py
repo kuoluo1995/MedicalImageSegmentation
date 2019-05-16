@@ -4,10 +4,10 @@ import numpy as np
 import tensorflow as tf
 from abc import abstractmethod
 from tensorflow.python.framework import errors_impl
+from pathlib import Path
 
-import train
-from train import metrics_function
-from train.config import CustomKeys
+from model_component import metrics_function
+from model_component.config import CustomKeys
 from utils.timer import Timer
 from utils.reader_tools import VolumeReader
 from utils.map_struct import flat_dict_convert_solid_dict
@@ -54,6 +54,10 @@ class BaseEvaluate:
                 counter += 1
         except errors_impl.OutOfRangeError:
             pass
+
+    @abstractmethod
+    def set_init_config(self, params):
+        pass
 
     @abstractmethod
     def set_config(self, params):

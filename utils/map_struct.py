@@ -1,4 +1,4 @@
-from train.config import CustomKeys
+from model_component.config import CustomKeys
 
 
 def flat_dict_convert_solid_dict(flat_dict):

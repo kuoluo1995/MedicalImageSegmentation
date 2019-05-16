@@ -1,5 +1,5 @@
-from train.networks.base import *
-from train.config import CustomKeys
+from model_component.networks.base import *
+from model_component.config import CustomKeys
 
 
 class UNet(BaseNet):

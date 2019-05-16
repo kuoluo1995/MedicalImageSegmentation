@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 from tensorflow import Dimension, TensorShape
 
-from train.mode.base import *
+from model_component.mode.base import *
 from utils import reader_tools
 
 

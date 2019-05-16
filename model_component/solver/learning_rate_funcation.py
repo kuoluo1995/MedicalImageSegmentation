@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from train.config import CustomKeys
+from model_component.config import CustomKeys
 
 
 def get_learning_rate(name, **params):

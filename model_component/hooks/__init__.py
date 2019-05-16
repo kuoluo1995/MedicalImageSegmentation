@@ -1,8 +1,8 @@
 import tensorflow as tf
 from tensorflow.python.training.training import CheckpointSaverHook, LoggingTensorHook, NanTensorHook, StopAtStepHook
-from train.hooks.iterator_string_handle_hook import IteratorStringHandleHook
-from train.hooks.best_checkpoint_saver_hook import BestCheckpointSaverHook
-from train.hooks.log_learning_rate_hook import LogLearningRateHook
+from model_component.hooks.iterator_string_handle_hook import IteratorStringHandleHook
+from model_component.hooks.best_checkpoint_saver_hook import BestCheckpointSaverHook
+from model_component.hooks.log_learning_rate_hook import LogLearningRateHook
 
 
 def get_train_hooks(params, *hooks):

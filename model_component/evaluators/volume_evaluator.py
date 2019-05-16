@@ -1,21 +1,21 @@
-from pathlib import Path
-
-from evaluators.base import *
+from model_component.evaluators.base import *
 
 
 class VolumeEvaluator(BaseEvaluate):
     name = 'volume'
     image_reader = VolumeReader()
 
-    def set_config(self, **params):
-        tf.logging.info('..... setting {} evaluate config'.format(self.name))
+    def set_init_config(self, params):
         self.eval_steps = params['eval_steps']
         self.metric_list = params['metric_list']
-        self.model_dict = params['model_dict']
-        self.estimator = params['estimator']
-        self.dataset = params['dataset']
         self.save_image = params['save_image']
         self.show_each_evaluate = params['show_each_evaluate']
+
+    def set_config(self, **params):
+        tf.logging.info('..... setting {} evaluate config'.format(self.name))
+        self.estimator = params['estimator']
+        self.model_dict = params['model_dict']
+        self.dataset = params['dataset']
 
     def compare(self, *args, **kwargs):
         def _compare(current_result, origin_result, **kwargs):
@@ -95,11 +95,8 @@ class VolumeEvaluator(BaseEvaluate):
         return results
 
     def set_eval_config(self, params):
-        self.eval_steps = params['evaluator']['eval_steps']
-        self.metric_list = params['evaluator']['metric_list']
-        self.save_image = params['evaluator']['save_image']
-        self.show_each_evaluate = params['evaluator']['show_each_evaluate']
-        self.estimator = train.estimator.MyEstimator()
+        from model_component.estimator import MyEstimator
+        self.estimator = MyEstimator()
         params['evaluator'] = self
         self.estimator.set_eval_config(params)
         self.dataset = self.estimator.dataset

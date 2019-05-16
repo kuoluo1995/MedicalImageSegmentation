@@ -3,13 +3,12 @@ import tensorflow_estimator as tf_es
 from pathlib import Path
 from tensorflow_estimator.python.estimator import estimator as estimator_lib
 from tensorflow.python.framework import ops, random_seed
-from tensorflow.python.training import training, warm_starting_util, checkpoint_management
+from tensorflow.python.training import training, checkpoint_management
 
 import build_dataset
-from train import config, hooks, mode, networks
-import evaluators
-from train.config import CustomKeys
-from train.solver.solver import Solver
+from model_component import config, hooks, mode, networks, evaluators
+from model_component.config import CustomKeys
+from model_component.solver.solver import Solver
 
 
 class MyEstimator:
@@ -30,7 +29,7 @@ class MyEstimator:
     _feed_dict = dict()
     _init_fn = None
     _estimator_spec = None
-    checkpoint_name = 'best_model.ckpt'
+    checkpoint_name = 'checkpoint_best'
 
     def _get_input_pipeline(self):
         with tf.variable_scope('InputPipeline/'):
@@ -129,8 +128,10 @@ class MyEstimator:
     def _set_modes(self, params):
         for key, value in params['dataset']['modes'].items():
             key = eval('CustomKeys.' + key)
-            if value['primary']:
+            if 'primary' in value:
                 self.primary_mode = key
+            if 'evaluator' in value:
+                self._evaluator = evaluators.create_evaluator(value['evaluator']['name'], value['evaluator'])
             self.mode_dict[key] = mode.create_mode(value['value'])
             self.mode_dict[key].set_config(**value)
 
@@ -152,9 +153,7 @@ class MyEstimator:
         self._solver.set_config(params['model']['solver'])
 
     def _set_evaluator(self, params):
-        self._evaluator = evaluators.create_evaluator(params['model']['evaluator']['name'])
-        self._evaluator.set_config(model_dict=self._model_dict, estimator=self, dataset=self.dataset,
-                                   **params['model']['evaluator'])
+        self._evaluator.set_config(model_dict=self._model_dict, estimator=self, dataset=self.dataset)
 
     def _get_scaffold_init(self):
         # todo improve 改善

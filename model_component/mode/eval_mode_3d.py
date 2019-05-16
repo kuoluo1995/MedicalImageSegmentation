@@ -1,4 +1,4 @@
-from train.mode.base import *
+from model_component.mode.base import *
 
 
 class EvalMode3D(BaseMode):

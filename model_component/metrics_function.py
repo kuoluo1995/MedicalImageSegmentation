@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from medpy import metric as metric_lib
 
-from train.config import CustomKeys
+from model_component.config import CustomKeys
 
 
 def get_mertrics(mertrics_name, logits, labels, eps, name):

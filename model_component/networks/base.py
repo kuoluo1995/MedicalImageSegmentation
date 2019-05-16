@@ -3,9 +3,9 @@ import tensorflow as tf
 from abc import abstractmethod
 from tensorflow.contrib import slim
 from tensorflow.python.ops import init_ops
-from train import loss_function
-from train import metrics_function
-from train.config import CustomKeys
+from model_component import loss_function
+from model_component import metrics_function
+from model_component.config import CustomKeys
 
 
 class BaseNet:

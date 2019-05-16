@@ -3,14 +3,14 @@ import tensorflow as tf
 import yaml
 from tensorflow.python import ops
 from tensorflow.python.eager import context
-from train.estimator import MyEstimator
-from train import config
+from model_component.estimator import MyEstimator
+from model_component import config
 
 
 def main():
     # 训练数据
     estimate = MyEstimator()
-    config_file = open('config/train/carcass_2d_train_config.yaml', 'rb')
+    config_file = open('config/train/body_2d_train_config.yaml', 'rb')
     estimate_config = yaml.load(config_file)
     config.set_logger(config.CustomKeys.TRAIN, estimate_config['tag'])
     tf.logging.info('input params:{}'.format(estimate_config))

@@ -1,4 +1,4 @@
-tag: 'carcass_twod_unet' # 这次训练的名称
+tag: 'body_2d_unet' # 这次训练的名称
 CUDA_VISIBLE_DEVICES: '1'
 random_seed: 1234
 batch_size: 4
@@ -8,13 +8,13 @@ estimator:
   save_summary_steps: 200
   save_checkpoints_steps: 5000
   keep_checkpoint_max: 1
-  log_step_count_steps: 500
+  log_step_count_steps: 100
   allow_soft_placement: true
   gpu_options_allow_growth: true
   save_best_checkpoint: true
 
 dataset:
-  name: 'CarcassDataset'
+  name: 'BodyDataset'
   modes: # 这里包含了具体几个模式的信息
     TRAIN:
       primary: true
@@ -22,18 +22,26 @@ dataset:
       dataset_path: 'train_TwoDExample.yaml'
     EVAL:
       primary: false
-      value: EvalMode3D
-      dataset_path: 'eval_ThreeDExample.yaml'
+      value: EvalMode
+      dataset_path: 'eval_TwoDExample.yaml'
+      evaluator:
+        name: 'SliceEvaluator'
+        eval_steps:  20
+        metric_list:
+          - 'Dice'
+        save_image: true
+        show_each_evaluate: true
+
   min_window_level: 0
   max_window_level: 2000
-  image_height: 256
-  image_width: 256
+  image_height: 512
+  image_width: 128
   num_parallel_batches: 1
   image_augmentation:
     random_zoom_in:
       max_scale: 1.5
-    #    random_noise:
-    #      scale: 0.05
+#    random_noise:
+#      scale: 0.05
     random_horizontally_flip: None
 
 model:
@@ -47,7 +55,7 @@ model:
         background:
           show: false
           weight: 0.2
-        carcass:
+        body:
           show: true
           weight: 0.1
       loss_name: 'weighted_sparse_softmax_cross_entropy'
@@ -72,14 +80,6 @@ model:
       name: 'adam'
       beta1: 0.9 # 参数什么意思
       beta2: 0.99
-
-  evaluator:
-    name: 'VolumeEvaluator'
-    eval_steps: 50
-    metric_list:
-      - 'Dice'
-    save_image: false
-    show_each_evaluate: false
 
 hooks:
 # 默认含有的hooks

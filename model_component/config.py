@@ -16,7 +16,7 @@ class CustomKeys:
     TRAIN = ModeKeys.TRAIN
     EVAL = ModeKeys.EVAL
     PREDICT = ModeKeys.PREDICT
-    SEPARATOR = "#@#"
+    SEPARATOR = "/"
     CLASSES = 'classes'
     PREDICTION = 'prediction'
     LABEL = 'label'

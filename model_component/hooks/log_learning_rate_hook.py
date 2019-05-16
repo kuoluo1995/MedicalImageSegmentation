@@ -4,7 +4,7 @@ from tensorflow.python.training import training_util
 from tensorflow.python.training.session_run_hook import SessionRunHook, SessionRunArgs
 from tensorflow.python.training.basic_session_run_hooks import SecondOrStepTimer
 from utils import summary_tools
-from train.config import CustomKeys
+from model_component.config import CustomKeys
 
 
 class LogLearningRateHook(SessionRunHook):

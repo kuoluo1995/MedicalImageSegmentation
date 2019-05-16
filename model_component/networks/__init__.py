@@ -1,4 +1,4 @@
-from train.networks.UNet import UNet
+from model_component.networks.UNet import UNet
 
 
 def create_network(network_name):
