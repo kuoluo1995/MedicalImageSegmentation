@@ -15,6 +15,6 @@ class IteratorStringHandleHook(SessionRunHook):
 
     def after_create_session(self, session, coord):
         del coord
+        tf.logging.info("................>>>>>>>>>>>>>>>> building iterator handler")
         for key in self.mode_dict:
             self.mode_dict[key].handler = session.run(self.mode_dict[key].string_handle)
-        tf.logging.info("build completed iterator handler")

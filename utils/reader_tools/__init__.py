@@ -1,5 +1,7 @@
 import nibabel
 import SimpleITK
+from nibabel import AnalyzeHeader
+
 from utils.reader_tools.image_reader import ImageReader
 from utils.reader_tools.volume_reader import VolumeReader
 
@@ -42,8 +44,9 @@ def nii_reader(path):
 def nii_header_reader(path):
     image = nibabel.load(str(path))
     image_header = image.header
+    pixdim = image_header.get('pixdim')
     image_affine = image.affine
-    return {'header': image_header, 'affine': image_affine}
+    return {'header': image_header, 'affine': image_affine, 'spacing': (pixdim[1], pixdim[2], pixdim[3])}
 
 
 def nii_writer(path, header, image_array):

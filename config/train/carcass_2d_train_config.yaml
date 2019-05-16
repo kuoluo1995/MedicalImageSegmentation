@@ -32,8 +32,8 @@ dataset:
   image_augmentation:
     random_zoom_in:
       max_scale: 1.5
-#    random_noise:
-#      scale: 0.05
+    #    random_noise:
+    #      scale: 0.05
     random_horizontally_flip: None
 
 model:
@@ -47,7 +47,7 @@ model:
         background:
           show: false
           weight: 0.2
-        body:
+        carcass:
           show: true
           weight: 0.1
       loss_name: 'weighted_sparse_softmax_cross_entropy'
@@ -74,12 +74,12 @@ model:
       beta2: 0.99
 
   evaluator:
-    name: 'SliceEvaluator'
-    eval_steps:  2500
+    name: 'VolumeEvaluator'
+    eval_steps: 50
     metric_list:
-      - 'dice'
-    save_image: true
-    show_each_evaluate: true
+      - 'Dice'
+    save_image: false
+    show_each_evaluate: false
 
 hooks:
 # 默认含有的hooks

@@ -6,7 +6,7 @@ from utils import reader_tools
 class ImageReader:
     image_path = None
     format = None
-    type = None
+    type = np.int16
     _decode = None
 
     is_label = None

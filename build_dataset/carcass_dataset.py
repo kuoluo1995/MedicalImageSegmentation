@@ -32,6 +32,10 @@ class CarcassDataset(BaseDataset):
     def deal_image(image_reader):
         return image_reader
 
+    @staticmethod
+    def restore_image(image_array):
+        return image_array
+
     # *************************************************训练时用的函数************************************************* #
     def set_train_config(self, **param):
         tf.logging.info('..... setting {} train config'.format(self.name))
