@@ -1,4 +1,3 @@
-tag: 'body_2d_unet' # 这次训练的名称
 CUDA_VISIBLE_DEVICES: '1'
 random_seed: 1234
 batch_size: 4
@@ -26,11 +25,11 @@ dataset:
       dataset_path: 'eval_TwoDExample.yaml'
       evaluator:
         name: 'SliceEvaluator'
-        eval_steps:  20
+        eval_steps:  200
         metric_list:
           - 'Dice'
-        save_image: true
-        show_each_evaluate: true
+        save_image: false
+        show_each_evaluate: false
 
   min_window_level: 0
   max_window_level: 2000
@@ -54,10 +53,10 @@ model:
       classes:
         background:
           show: false
-          weight: 0.2
+          weight: 0.5
         body:
           show: true
-          weight: 0.1
+          weight: 1
       loss_name: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
         dice:

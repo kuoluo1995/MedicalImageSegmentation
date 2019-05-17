@@ -1,4 +1,3 @@
-tag: 'body_2d_unet' # 这次训练的名称
 CUDA_VISIBLE_DEVICES: '1'
 random_seed: 1234
 batch_size: 4
@@ -12,12 +11,13 @@ evaluator:
   show_each_evaluate: true
 
 dataset:
-  name: 'BodyDataset'
+  name: 'CarcassDataset'
   modes: # 这里包含了具体几个模式的信息
     PREDICT:
       primary: true
       value: EvalMode3D
       dataset_path: 'eval_ThreeDExample.yaml'
+
   image_height: 512
   image_width: 128
   min_window_level: 0

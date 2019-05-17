@@ -83,7 +83,7 @@ class UNet(BaseNet):
     def _build_loss(self, logits, label):
         tf.logging.info('................>>>>>>>>>>>>>>>> building loss')
         with tf.variable_scope('Losses'):
-            loss_function.get_loss(self.loss_name, logits, label, self.classes)
+            loss_function.get_loss(self.loss_name, logits, label, classes=self.classes)
             total_loss = tf.losses.get_total_loss()
             tf.losses.add_loss(total_loss)
             return total_loss
