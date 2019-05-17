@@ -20,11 +20,11 @@ dataset:
       value: TrainMode
       dataset_path: 'train_TwoDExample.yaml'
     EVAL:
-      value: EvalMode
-      dataset_path: 'eval_TwoDExample.yaml'
+      value: EvalMode3D
+      dataset_path: 'eval_ThreeDExample.yaml'
       evaluator:
-        name: 'SliceEvaluator'
-        eval_steps:  200
+        name: 'VolumeEvaluator'
+        eval_steps:  2
         metric_list:
           - 'Dice'
         save_image: false

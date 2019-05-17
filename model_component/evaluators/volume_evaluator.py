@@ -39,7 +39,8 @@ class VolumeEvaluator(BaseEvaluate):
             for class_key, image3d in logits3d.items():
                 metrics_3d = metrics_function.metric_3d(logits3d[class_key], labels3d[class_key],
                                                         required=self.metric_list,
-                                                        sampling=self.image_reader.header['spacing'])
+                                                        spacing=self.dataset.deal_spacing(
+                                                            self.image_reader.header['spacing']))
                 for metric_key, metric_value in metrics_3d.items():
                     metrics_dict['{}/{}'.format(class_key, metric_key)] = metric_value
             self.append_metrics(metrics_dict)
@@ -91,7 +92,7 @@ class VolumeEvaluator(BaseEvaluate):
         self._evaluate(predict_generation)
         results = {key: np.mean(values) for key, values in self._metric_values.items()}
         for key, value in results.items():
-            tf.logging.info('{}----->{:.3f}\t'.format(key, value))
+            tf.logging.info('{}----->{}\t'.format(key, value))
         return results
 
     def set_eval_config(self, params):

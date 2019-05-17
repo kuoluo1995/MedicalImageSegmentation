@@ -33,6 +33,10 @@ class CarcassDataset(BaseDataset):
         return image_reader
 
     @staticmethod
+    def deal_spacing(array):
+        return array
+
+    @staticmethod
     def restore_image(image_array):
         return image_array
 

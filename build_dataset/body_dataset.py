@@ -37,6 +37,11 @@ class BodyDataset(BaseDataset):
         return image_reader
 
     @staticmethod
+    def deal_spacing(array):
+        new_spacing = (array[1], array[0], array[2])
+        return new_spacing
+
+    @staticmethod
     def restore_image(image_array):
         image_array = image_array.transpose((1, 0, 2))
         return np.flipud(image_array)

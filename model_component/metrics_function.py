@@ -107,7 +107,7 @@ def metric_3d(logits3d, labels3d, required=None, **kwargs):
     labels3d = labels3d.astype(np.bool)
 
     metrics_3d = {}
-    sampling = kwargs.get("sampling", [1., 1., 1.])
+    spacing = kwargs.get("spacing", [1., 1., 1.])
 
     if need_dist_map:
         from utils.surface import Surface
@@ -115,7 +115,7 @@ def metric_3d(logits3d, labels3d, required=None, **kwargs):
             metrics_3d['ASSD'] = 0
             metrics_3d['MSD'] = 0
         else:
-            eval_surf = Surface(logits3d, labels3d, physical_voxel_spacing=sampling,
+            eval_surf = Surface(logits3d, labels3d, physical_voxel_spacing=spacing,
                                 mask_offset=[0., 0., 0.],
                                 reference_offset=[0., 0., 0.])
 
