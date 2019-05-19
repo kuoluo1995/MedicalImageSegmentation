@@ -30,7 +30,10 @@ class ImageReader:
         self.format = Path(image_file).suffix[1:]
         self._reader = eval('reader_tools.' + self.format + '_reader')
         self._writer = eval('reader_tools.' + self.format + '_writer')
-        self._decode = self._reader(image_file).astype(self.type, copy=False)
+        self._decode = self._reader(image_file)
+        if self._decode.dtype == float:
+            self._decode += 0.5
+        self._decode = self._decode.astype(self.type, copy=False)
 
     def get_data_and_shape(self, idx=None):
         def to_image():
