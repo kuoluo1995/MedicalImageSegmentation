@@ -5,12 +5,15 @@ from tensorflow.contrib import data as contrib_data
 from tensorflow.python import ops
 from tensorflow.python.data import Dataset, experimental, TFRecordDataset
 from tensorflow.python.estimator import util
+from model_component.config import CustomKeys
 from utils import example_tools, image_process_operations, yaml_tools
 
 
 class BaseMode:
     name = None
     dataset_path = None
+    example = None
+    dataset_dict = None
     # IteratorStringHandleHook 专用
     handler = None
     iterator = None
@@ -29,4 +32,8 @@ class BaseMode:
 
     @abstractmethod
     def adjust_window_size(self, image, min_window, max_window):
+        pass
+
+    @abstractmethod
+    def get_extra_feature(self, **params):
         pass

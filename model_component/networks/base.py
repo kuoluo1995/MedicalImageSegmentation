@@ -95,7 +95,8 @@ class BaseNet:
     def get_predictions(self):
         # todo improve 这里未来可以加prediction特征值提取
         prediction_dict = dict()
-        prediction_dict['image_path'] = self.feature['image_path']
+        for key, value in self.feature.items():
+            prediction_dict[key] = value
         for key, value in self.classes.items():
             if value['show']:
                 prediction_dict[

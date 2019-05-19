@@ -1,10 +1,9 @@
-import tensorflow as tf
-
-from utils.example_tools import base
+from utils.example_tools.base import *
 
 
-class ThreeDExample(base.BaseExample):
+class ThreeDExample(BaseExample):
     name = 'threeD'
+    extra_feature = {'padding_len': {CustomKeys.VALUE: 0, CustomKeys.TYPE: tf.int64}}
 
     def _create_example_format(self):
         self.dataset_class.deal_image(self.image_reader)
@@ -12,20 +11,19 @@ class ThreeDExample(base.BaseExample):
         image, image_shape = self.image_reader.get_data_and_shape()
         label, label_shape = self.label_reader.get_data_and_shape()
         feature = {
-            'image/image_path': base.feature_to_bytes_list(self.image_reader.image_path),
-            'image/shape': base.feature_to_int64_list(image_shape),
-            'image/encoded': base.feature_to_bytes_list(image),
-            'segmentation/shape': base.feature_to_int64_list(label_shape),
-            'segmentation/encoded': base.feature_to_bytes_list(label),
+            'image/image_path': feature_to_bytes_list(self.image_reader.image_path),
+            'image/shape': feature_to_int64_list(image_shape),
+            'image/encoded': feature_to_bytes_list(image),
+            'segmentation/shape': feature_to_int64_list(label_shape),
+            'segmentation/encoded': feature_to_bytes_list(label),
         }
         yield tf.train.Example(features=tf.train.Features(feature=feature))
 
     def read_example(self, example_proto, mode, **params):
-        def padding(image, shape):
-            padding_length = params['batch_size'] - shape[0] % params['batch_size']
-            padding_shape = tf.concat(([padding_length], shape[1:]), axis=0)
-            padding_image = tf.zeros(padding_shape, dtype=image.dtype)
-            new_image = tf.concat((image, padding_image), axis=0)
+        def padding(source_image, shape):
+            padding_shape = tf.concat(([padding_len], shape[1:]), axis=0)
+            padding_image = tf.zeros(padding_shape, dtype=source_image.dtype)
+            new_image = tf.concat((source_image, padding_image), axis=0)
             return new_image
 
         tf.logging.info('................>>>>>>>>>>>>>>>> reading {} example'.format(self.name))
@@ -39,6 +37,7 @@ class ThreeDExample(base.BaseExample):
             }
             # with tf.control_dependencies([tf.print(features['image/name'], features['image/shape'])]):
             features = tf.parse_single_example(example_proto, features=features)
+            padding_len = params['batch_size'] - features['image/shape'][0] % params['batch_size']
             with tf.variable_scope('GetImage'):
                 image = tf.decode_raw(features['image/encoded'], tf.int16)
                 image = tf.reshape(image, features['image/shape'])
@@ -49,5 +48,9 @@ class ThreeDExample(base.BaseExample):
                 label = tf.reshape(label, features['segmentation/shape'])
                 label = tf.cast(label, tf.int32)
                 label = padding(label, features['segmentation/shape'])
-            return_feature = {'image': image, 'image_path': features['image/image_path']}
-            return return_feature, label
+            feature = {CustomKeys.IMAGE: image, CustomKeys.IMAGE_PATH: features['image/image_path'],
+                       'padding_len': padding_len}
+            for other, value in params['extra_feature'].items():
+                if other not in feature:
+                    feature[other] = tf.constant(value[CustomKeys.VALUE], dtype=value[CustomKeys.TYPE])
+            return feature, label

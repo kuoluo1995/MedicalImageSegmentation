@@ -28,7 +28,7 @@ def print_data(image, label, index, name):
 
 def read_tfrecord(num_samples=26, num_classes=2):
     keys_to_features = {
-        'image/name': tf.FixedLenFeature([], tf.string),
+        'image/image_path': tf.FixedLenFeature([], tf.string),
         'image/shape': tf.FixedLenFeature([3], tf.int64),
         'image/encoded': tf.FixedLenFeature([], tf.string),
         'segmentation/shape': tf.FixedLenFeature([2], tf.int64),
@@ -37,7 +37,7 @@ def read_tfrecord(num_samples=26, num_classes=2):
     }
 
     items_to_handlers = {
-        'name': slim.tfexample_decoder.Tensor('image/name'),
+        'image_path': slim.tfexample_decoder.Tensor('image/image_path'),
         'image': slim.tfexample_decoder.Tensor('image/encoded'),
         'image_shape': slim.tfexample_decoder.Tensor('image/shape'),
         'label': slim.tfexample_decoder.Tensor('segmentation/encoded'),
@@ -54,7 +54,7 @@ def read_tfrecord(num_samples=26, num_classes=2):
                                                               common_queue_capacity=256, common_queue_min=128,
                                                               seed=None)
     name, image, image_shape, label, label_shape, index = provider.get(
-        ['name', 'image', 'image_shape', 'label', 'label_shape', 'index'])
+        ['image_path', 'image', 'image_shape', 'label', 'label_shape', 'index'])
     image = tf.decode_raw(image, tf.int16)
     image = tf.reshape(image, image_shape)
     image = tf.to_float(image)

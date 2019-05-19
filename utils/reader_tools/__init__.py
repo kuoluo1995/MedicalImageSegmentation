@@ -44,9 +44,9 @@ def nii_reader(path):
 def nii_header_reader(path):
     image = nibabel.load(str(path))
     image_header = image.header
-    pixdim = image_header.get('pixdim')
+    pix_dim = image_header.get('pixdim')
     image_affine = image.affine
-    return {'header': image_header, 'affine': image_affine, 'spacing': (pixdim[1], pixdim[2], pixdim[3])}
+    return {'header': image_header, 'affine': image_affine, 'spacing': (pix_dim[1], pix_dim[2], pix_dim[3])}
 
 
 def nii_writer(path, header, image_array):

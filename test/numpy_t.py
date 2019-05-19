@@ -1,5 +1,4 @@
-from utils.reader_tools import ImageReader
+import numpy as np
 
-reader = ImageReader()
-reader.read_header_dict('E:/Corpus_Callosum/Acao_nvhua/image.nii')
-print(11)
+image = np.array([1,2,3,4,5,6,7,8])
+print(image[:0])

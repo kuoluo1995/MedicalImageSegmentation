@@ -4,7 +4,7 @@ dataset:
   name: 'CarcassDataset'
 
   source_data:
-    path: '/home/yf/Corpus_Callosum' #'E:/Slimed_NF'
+    path: 'E:/Corpus_Callosum' #'/home/yf/Corpus_Callosum'
     reader_tools: 'ImageReader'
     extra:
 

@@ -31,7 +31,7 @@ dataset:
         show_each_evaluate: false
 
   min_window_level: 0
-  max_window_level: 2000
+  max_window_level: 5000
   image_height: 256
   image_width: 256
   num_parallel_batches: 1
@@ -55,7 +55,7 @@ model:
           weight: 0.2
         carcass:
           show: true
-          weight: 1.72
+          weight: 10
       loss_name: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
         dice:

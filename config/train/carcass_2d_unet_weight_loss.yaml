@@ -7,24 +7,24 @@ estimator:
   save_summary_steps: 200
   save_checkpoints_steps: 5000
   keep_checkpoint_max: 1
-  log_step_count_steps: 100
+  log_step_count_steps: 500
   allow_soft_placement: true
   gpu_options_allow_growth: true
   save_best_checkpoint: true
 
 dataset:
-  name: 'BodyDataset'
+  name: 'CarcassDataset'
   modes: # 这里包含了具体几个模式的信息
     TRAIN:
       primary: true
       value: TrainMode
       dataset_path: 'train_TwoDExample.yaml'
     EVAL:
-      value: EvalMode3D
-      dataset_path: 'eval_ThreeDExample.yaml'
+      value: EvalMode
+      dataset_path: 'eval_TwoDExample.yaml'
       evaluator:
-        name: 'VolumeEvaluator'
-        eval_steps:  200
+        name: 'SliceEvaluator'
+        eval_steps: 7720
         metric_list:
           - 'Dice'
         save_image: false
@@ -32,14 +32,14 @@ dataset:
 
   min_window_level: 0
   max_window_level: 2000
-  image_height: 512
-  image_width: 128
+  image_height: 256
+  image_width: 256
   num_parallel_batches: 1
   image_augmentation:
     random_zoom_in:
       max_scale: 1.5
-#    random_noise:
-#      scale: 0.05
+    #    random_noise:
+    #      scale: 0.05
     random_horizontally_flip: None
 
 model:
@@ -53,7 +53,7 @@ model:
         background:
           show: false
           weight: 0.5
-        body:
+        carcass:
           show: true
           weight: 1
       loss_name: 'weighted_sparse_softmax_cross_entropy'

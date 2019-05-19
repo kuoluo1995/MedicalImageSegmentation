@@ -26,7 +26,7 @@ class BodyDataset(BaseDataset):
     def _get_source_data(self):
         image_data = list(self._source_data_path.rglob(self._image_pattern))
         source_data = [
-            {'image': str(source).replace('stir', 'STIR'), 'label': str(source).replace('stir', 'STIR-label')}
+            {'image': source, 'label': str(source).replace('STIR', 'STIR-label')}
             for source in image_data]
         return source_data
 

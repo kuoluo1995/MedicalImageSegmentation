@@ -20,6 +20,10 @@ class CustomKeys:
     CLASSES = 'classes'
     PREDICTION = 'prediction'
     LABEL = 'label'
+    IMAGE = 'image'
+    IMAGE_PATH = 'image_path'
+    VALUE = 'value'
+    TYPE = 'type'
 
 
 def get_session_config(allow_soft_placement, gpu_options_allow_growth):

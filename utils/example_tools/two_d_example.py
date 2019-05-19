@@ -3,6 +3,7 @@ from utils.example_tools.base import *
 
 class TwoDExample(BaseExample):
     name = 'twoD'
+    extra_feature = {'index': {CustomKeys.VALUE: 0, CustomKeys.TYPE: tf.int64}}
 
     def _create_example_format(self):
         self.dataset_class.deal_image(self.image_reader)
@@ -40,5 +41,9 @@ class TwoDExample(BaseExample):
                 label = tf.decode_raw(features['segmentation/encoded'], tf.uint8)
                 label = tf.reshape(label, features['segmentation/shape'])
                 label = tf.to_int32(label)
-            return_feature = {'image': image, 'image_path': features['image/image_path']}
-            return return_feature, label
+            feature = {CustomKeys.IMAGE: image, CustomKeys.IMAGE_PATH: features['image/image_path'],
+                       'index': features['extra/index']}
+            for other, value in params['extra_feature'].items():
+                if other not in feature:
+                    feature[other] = tf.constant(value[CustomKeys.VALUE], dtype=value[CustomKeys.TYPE])
+            return feature, label,

@@ -137,17 +137,20 @@ class BaseDataset:
     def get_data_iterator(self, mode_dict):
         hooks = list()
         dataset_list = list()
-        with ops.device('/cpu:0'):  # todo test 带测试下。取消这个会如何？
-            for key in mode_dict:
-                dataset = mode_dict[key].get_dataset(base_path=self._output_data_path, batch_size=self.batch_size,
-                                                     min_window_level=self.min_window_level,
-                                                     max_window_level=self.max_window_level,
-                                                     image_height=self.image_height, image_width=self.image_width,
-                                                     seed=self.seed, num_parallel_batches=self.num_parallel_batches,
-                                                     image_augmentation=self.image_augmentation_dict)
-                mode_dict[key].iterator = dataset.make_initializable_iterator()
-                hooks.append(estimator_util._DatasetInitializerHook(mode_dict[key].iterator))
-                dataset_list.append(dataset)
+        # with ops.device('/cpu:0'):  # todo test 带测试下。取消这个会如何？
+        extra_feature = dict()
+        for key in mode_dict:
+            extra_feature.update(mode_dict[key].get_extra_feature(base_path=self._output_data_path))
+        for key in mode_dict:
+            dataset = mode_dict[key].get_dataset(extra_feature=extra_feature, batch_size=self.batch_size,
+                                                 min_window_level=self.min_window_level,
+                                                 max_window_level=self.max_window_level,
+                                                 image_height=self.image_height, image_width=self.image_width,
+                                                 seed=self.seed, num_parallel_batches=self.num_parallel_batches,
+                                                 image_augmentation=self.image_augmentation_dict)
+            mode_dict[key].iterator = dataset.make_initializable_iterator()
+            hooks.append(estimator_util._DatasetInitializerHook(mode_dict[key].iterator))
+            dataset_list.append(dataset)
         # todo improve 合理的拿出feature来的方法
         with tf.variable_scope('DatasetIterator'):
             tf.logging.info('..... building dataset iterator')

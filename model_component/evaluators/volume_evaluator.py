@@ -31,8 +31,11 @@ class VolumeEvaluator(BaseEvaluate):
 
     def _evaluate(self, predict_generation):
         def evaluate_case():
-            logits3d = {class_key: np.concatenate(values) for class_key, values in logits.items()}
-            labels3d = {class_key: np.concatenate(values) for class_key, values in labels.items()}
+            logits3d = {class_key: np.concatenate(values) if padding_len == 0 else np.concatenate(values)[:-padding_len]
+                        for class_key, values in logits.items()}
+            labels3d = {class_key: np.concatenate(values) if padding_len == 0 else np.concatenate(values)[:-padding_len]
+                        for class_key, values in labels.items()}
+
             image_path = Path(current_path)
             self.image_reader.read_header_dict(image_path)
             metrics_dict = dict()
@@ -64,7 +67,9 @@ class VolumeEvaluator(BaseEvaluate):
         current_step = 0
         for predict in predict_generation:
             predict = flat_dict_convert_solid_dict(predict)
-            new_path = predict['image_path'][0].decode('utf-8')  # batch_size个name
+            new_path = predict[CustomKeys.IMAGE_PATH][0].decode('utf-8')
+            padding_len = predict['padding_len'][0]
+            # batch_size个name
             if current_path is None:
                 current_path = new_path
             if current_path == new_path:

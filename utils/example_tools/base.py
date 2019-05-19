@@ -1,6 +1,7 @@
 import tensorflow as tf
 from abc import abstractmethod
 from collections import Iterable
+from model_component.config import CustomKeys
 from utils import image_process_operations
 
 
@@ -27,6 +28,7 @@ class BaseExample:
     image_reader = None
     label_reader = None
     dataset_class = None
+    extra_feature = dict()
 
     @abstractmethod
     def _create_example_format(self):
