@@ -51,9 +51,9 @@ class SliceEvaluator(BaseEvaluate):
         self.estimator.set_eval_config(params)
         self.dataset = self.estimator.dataset
 
-    def evaluate(self):
+    def evaluate(self, graph):
         tf.logging.info('begin {} evaluating......................................................'.format(self.name))
-        predict_generation = self.estimator.get_evaluate_predictions()
+        predict_generation = self.estimator.get_evaluate_predictions(graph)
         self.clear_metrics()
         for prediction in predict_generation:
             self.append_metrics(prediction)

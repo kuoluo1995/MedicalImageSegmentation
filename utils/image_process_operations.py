@@ -37,18 +37,22 @@ def random_zoom_in(image, label, max_scale, seed, **kwargs):
 
 
 def random_volume_zoom_in(image, label, max_scale, seed, **kwargs):
-    with tf.variable_scope('RandomZoomIn', [image, max_scale]):
+    with tf.variable_scope('RandomZoomIn', [image, label, max_scale]):
         tf.logging.info('................>>>>>>>>>>>>>>>> augmentation: random volume zoom in')
         scale = tf.random_uniform([2], 1, max_scale, seed=seed)
         new_size = tf.to_int32(tf.to_float(tf.shape(label)[1:]) * scale)
-        central_zoom_in_image = tf.image.resize_bilinear(image, new_size)
-        extended_label = tf.expand_dims(label, -1)
-        central_zoom_in_label = tf.to_float(tf.image.resize_nearest_neighbor(extended_label, new_size))
+        expanded_image = tf.expand_dims(image, axis=-1)
+        central_zoom_in_image = tf.image.resize_bilinear(expanded_image, new_size)
+
+        expanded_label = tf.expand_dims(label, -1)
+        central_zoom_in_label = tf.to_float(tf.image.resize_nearest_neighbor(expanded_label, new_size))
+
         combined = tf.concat(axis=-1, values=[central_zoom_in_image, central_zoom_in_label])
-        new_shape = tf.concat([tf.shape(label), [tf.shape(image)[-1] + 1]], axis=0)
+        new_shape = tf.concat([tf.shape(label), [tf.shape(expanded_image)[-1] + tf.shape(expanded_label)[-1]]],
+                              axis=0)
         cropped_combined = tf.image.random_crop(combined, new_shape, seed=seed)
-        cropped_image = cropped_combined[..., :-1]
-        cropped_label = tf.to_int32(cropped_combined[..., -1])
+        cropped_image = cropped_combined[..., 0]
+        cropped_label = tf.to_int32(cropped_combined[..., 1])
         return cropped_image, cropped_label
 
 

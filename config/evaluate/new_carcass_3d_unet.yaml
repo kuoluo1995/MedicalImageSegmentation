@@ -18,10 +18,10 @@ dataset:
       value: EvalMode3D
       dataset_path: 'eval_ThreeDExample.yaml'
 
-  image_height: 512
-  image_width: 128
+  image_height: 256
+  image_width: 256
   min_window_level: 0
-  max_window_level: 2000
+  max_window_level: 5000
   num_parallel_batches: 1
   image_augmentation:
 
@@ -38,11 +38,11 @@ model:
       classes:
         background:
           show: false
-          weight: 0.2
+          weight: 1
         body:
           show: true
-          weight: 0.1
-      loss_name: 'weighted_sparse_softmax_cross_entropy'
+          weight: 1
+      loss: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
         dice:
           eps: 1e-5

@@ -56,7 +56,8 @@ model:
         body:
           show: true
           weight: 1
-      loss_name: 'weighted_sparse_softmax_cross_entropy'
+      loss:
+        name: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
         dice:
           eps: 1e-5

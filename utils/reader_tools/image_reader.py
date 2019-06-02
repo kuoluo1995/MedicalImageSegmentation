@@ -35,7 +35,10 @@ class ImageReader:
             self._decode += 0.5
         self._decode = self._decode.astype(self.type, copy=False)
 
-    def get_data_and_shape(self, idx=None):
+    def set_image(self, image_array):
+        self._decode = image_array
+
+    def get_data(self, idx=None):
         def to_image():
             if idx is None:
                 return self._decode
@@ -55,7 +58,7 @@ class ImageReader:
         if self._decode is None:
             raise ValueError('no data: file_name ({})'.format(self.image_path))
         image = to_image()
-        return image.tobytes(), image.shape
+        return image
 
     def transpose(self, dims):
         self._decode = self._decode.transpose(dims)

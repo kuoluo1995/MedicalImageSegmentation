@@ -5,8 +5,8 @@ from medpy import metric as metric_lib
 from model_component.config import CustomKeys
 
 
-def get_mertrics(mertrics_name, logits, labels, eps, name):
-    return eval(mertrics_name)(logits, labels, eps, name)
+def get_mertrics(mertrics_name, logits, labels, name, **kwargs):
+    return eval(mertrics_name)(logits, labels, name, **kwargs)
 
 
 def get_total_mertrics():
@@ -14,17 +14,16 @@ def get_total_mertrics():
         yield metric
 
 
-def dice(logits, labels, eps, name):
+def dice(logits, labels, name, eps, **kwargs):
     eps = float(eps)
     dim = len(logits.get_shape())
     sum_axis = list(range(1, dim))
     with tf.variable_scope(name, [logits, labels, eps]):
-        logits = tf.cast(logits, tf.float32)
-        label = tf.cast(labels, tf.float32)
-
-        AB = tf.reduce_sum(logits * label, axis=sum_axis)
-        A = tf.reduce_sum(logits, axis=sum_axis)
-        B = tf.reduce_sum(label, axis=sum_axis)
+        floats_logits = tf.cast(logits, tf.float32)
+        floats_labels = tf.cast(labels, tf.float32)
+        AB = tf.reduce_sum(floats_logits * floats_labels, axis=sum_axis)
+        A = tf.reduce_sum(floats_logits, axis=sum_axis)
+        B = tf.reduce_sum(floats_labels, axis=sum_axis)
         dice = (2 * AB + eps) / (A + B + eps)
         # todo improve tf.identity(dice, name="value")
         dice = tf.reduce_mean(dice, name="value")

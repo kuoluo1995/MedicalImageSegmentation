@@ -29,8 +29,17 @@ class CarcassDataset(BaseDataset):
         return source_data
 
     @staticmethod
-    def deal_image(image_reader):
-        return image_reader
+    def deal_image(image_reader, label_reader):
+        image_array = list()
+        label_array = list()
+        image = image_reader.get_data()
+        label = label_reader.get_data()
+        for i, array in enumerate(label):
+            if np.max(array) > 0:
+                label_array.append(array)
+                image_array.append(image[i])
+        image_reader.set_image(np.array(image_array))
+        label_reader.set_image(np.array(label_array))
 
     @staticmethod
     def deal_spacing(array):

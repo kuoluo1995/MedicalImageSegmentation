@@ -3,7 +3,8 @@ import tensorflow_estimator as tf_es
 from pathlib import Path
 from tensorflow_estimator.python.estimator import estimator as estimator_lib
 from tensorflow.python.framework import ops, random_seed
-from tensorflow.python.training import training, checkpoint_management
+from tensorflow.python.training import training, checkpoint_management, training_util
+from tensorflow.python.ops import variable_scope
 
 import build_dataset
 from model_component import config, hooks, mode, networks, evaluators
@@ -30,6 +31,10 @@ class MyEstimator:
     _init_fn = None
     _estimator_spec = None
     checkpoint_name = 'checkpoint_best'
+
+    def _get_global_step(self, graph):
+        with variable_scope.variable_scope(self.tag):
+            training.get_or_create_global_step(graph)
 
     def _get_input_pipeline(self):
         with tf.variable_scope('InputPipeline/'):
@@ -89,7 +94,9 @@ class MyEstimator:
         self._set_solver(params)
         self._set_evaluator(params)
 
-    def train(self):
+    def train(self, graph):
+        tf.logging.info('>>>>>>>>>>>>>>>>>>>> building global_step')
+        self._get_global_step(graph)
         tf.logging.info('>>>>>>>>>>>>>>>>>>>> building input pipeline')
         feature, label, input_hooks, self.handler = self._get_input_pipeline()
         tf.logging.info('>>>>>>>>>>>>>>>>>>>> building model')
@@ -189,7 +196,9 @@ class MyEstimator:
         self._set_dataset(params)
         self._set_models(params)
 
-    def get_evaluate_predictions(self):
+    def get_evaluate_predictions(self, graph):
+        tf.logging.info('>>>>>>>>>>>>>>>>>>>> building global_step')
+        self._get_global_step(graph)
         tf.logging.info('>>>>>>>>>>>>>>>>>>>> building checkpoint')
         checkpoint_path = checkpoint_management.latest_checkpoint(self._model_dir, self.checkpoint_name)
         tf.logging.info('>>>>>>>>>>>>>>>>>>>> building input pipeline')

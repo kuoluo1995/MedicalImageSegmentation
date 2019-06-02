@@ -31,10 +31,11 @@ class BodyDataset(BaseDataset):
         return source_data
 
     @staticmethod
-    def deal_image(image_reader):
+    def deal_image(image_reader, label_reader):
         image_reader.flipud()
         image_reader.transpose((1, 0, 2))
-        return image_reader
+        label_reader.flipud()
+        label_reader.transpose((1, 0, 2))
 
     @staticmethod
     def deal_spacing(array):

@@ -24,15 +24,11 @@ class BaseNet:
     logits = None
     _loss = None
 
-    loss_name = None
+    loss = None
     train_metrics = None
 
     def __init__(self):
         tf.logging.info('#### init {} network'.format(self.name))
-
-    @property
-    def loss(self):
-        return self._loss
 
     @abstractmethod
     def set_config(self, **params):

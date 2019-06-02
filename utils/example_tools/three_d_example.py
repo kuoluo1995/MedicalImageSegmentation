@@ -2,20 +2,25 @@ from utils.example_tools.base import *
 
 
 class ThreeDExample(BaseExample):
-    name = 'threeD'
+    name = 'ThreeDExample'
     extra_feature = {'padding_len': {CustomKeys.VALUE: 0, CustomKeys.TYPE: tf.int64}}
 
+    def set_config(self, **params):
+        self.writer = params['writer']
+        self.image_reader = params['image_reader']
+        self.label_reader = params['label_reader']
+        self.dataset_class = params['dataset_class']
+
     def _create_example_format(self):
-        self.dataset_class.deal_image(self.image_reader)
-        self.dataset_class.deal_image(self.label_reader)
-        image, image_shape = self.image_reader.get_data_and_shape()
-        label, label_shape = self.label_reader.get_data_and_shape()
+        self.dataset_class.deal_image(self.image_reader, self.label_reader)
+        image = self.image_reader.get_data()
+        label = self.label_reader.get_data()
         feature = {
             'image/image_path': feature_to_bytes_list(self.image_reader.image_path),
-            'image/shape': feature_to_int64_list(image_shape),
-            'image/encoded': feature_to_bytes_list(image),
-            'segmentation/shape': feature_to_int64_list(label_shape),
-            'segmentation/encoded': feature_to_bytes_list(label),
+            'image/shape': feature_to_int64_list(image.shape),
+            'image/encoded': feature_to_bytes_list(image.tobytes()),
+            'segmentation/shape': feature_to_int64_list(label.shape),
+            'segmentation/encoded': feature_to_bytes_list(label.tobytes()),
         }
         yield tf.train.Example(features=tf.train.Features(feature=feature))
 

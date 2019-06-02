@@ -3,7 +3,7 @@ random_seed: 1234
 batch_size: 4
 
 estimator:
-  num_steps: 400000
+  num_steps: 200000
   save_summary_steps: 200
   save_checkpoints_steps: 5000
   keep_checkpoint_max: 1
@@ -18,13 +18,13 @@ dataset:
     TRAIN:
       primary: true
       value: TrainMode
-      dataset_path: 'train_TwoDExample.yaml'
+      dataset_path: 'train_TwoDExample_channel_1.yaml'
     EVAL:
       value: EvalMode3D
-      dataset_path: 'eval_ThreeDExample.yaml'
+      dataset_path: 'eval_ThreeDExample_channel_1.yaml'
       evaluator:
         name: 'VolumeEvaluator'
-        eval_steps: 200
+        eval_steps: 100
         metric_list:
           - 'Dice'
         save_image: false
@@ -52,15 +52,16 @@ model:
       classes:
         background:
           show: false
-          weight: 0.2
+          weight: 0.5
         carcass:
           show: true
-          weight: 5
-      loss_name: 'weighted_sparse_softmax_cross_entropy'
+          weight: 2
+      loss:
+        name: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
         dice:
           eps: 1e-5
-      num_down_samples: 4
+      num_down_samples: 5
 
   solver:
     slow_start_step: 0
@@ -68,8 +69,8 @@ model:
     learning_rate:
       name: 'piecewise_constant'
       boundaries:
-        - 200000
-        - 300000 # learning_rate_decay_boundaries
+        - 100000
+        - 150000 # learning_rate_decay_boundaries
       values:
         - 0.003
         - 0.0003

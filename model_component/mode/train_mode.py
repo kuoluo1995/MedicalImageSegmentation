@@ -23,17 +23,17 @@ class TrainMode(BaseMode):
                     for function_name in params['image_augmentation']:
                         kwargs = {} if params['image_augmentation'][function_name] == 'None' else \
                             params['image_augmentation'][function_name]
-                        feature['image'], new_label = image_process_operations.process_image(
-                            function_name=function_name, image=feature['image'], label=label, **kwargs, **params)
+                        feature[CustomKeys.IMAGE], new_label = image_process_operations.process_image(
+                            function_name=function_name, image=feature[CustomKeys.IMAGE], label=label, **kwargs, **params)
                         if new_label is not None:
                             label = new_label
 
                 with tf.variable_scope('UnitedImageSize'):
-                    image = tf.image.resize_bilinear(tf.expand_dims(feature['image'], axis=0),
+                    image = tf.image.resize_bilinear(tf.expand_dims(feature[CustomKeys.IMAGE], axis=0),
                                                      [params['image_height'], params['image_width']])
                     image = self.adjust_window_size(image, params['min_window_level'], params['max_window_level'])
                     image.set_shape([None, None, None, self.dataset_dict['image_channel']])
-                    feature['image'] = tf.squeeze(image, axis=0)
+                    feature[CustomKeys.IMAGE] = tf.squeeze(image, axis=0)
                 with tf.variable_scope('UnitedLabelSize'):
                     label = tf.image.resize_nearest_neighbor(tf.expand_dims(tf.expand_dims(label, axis=0), axis=-1),
                                                              [params['image_height'], params['image_width']])

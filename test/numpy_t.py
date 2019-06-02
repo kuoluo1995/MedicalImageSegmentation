@@ -1,4 +1,8 @@
-import numpy as np
+from tensorboard.plugins.mesh import summary as mesh_summary
 
-image = np.array([1,2,3,4,5,6,7,8])
-print(image[:0])
+...
+
+point_cloud = tf.constant([[[0.19, 0.78, 0.02], ...]], shape=[1, 1064, 3])
+point_colors = tf.constant([[[128, 104, 227], ...]], shape=[1, 1064, 3])
+
+summary = mesh_summary.op('point_cloud', vertices=point_cloud, colors=point_colors)

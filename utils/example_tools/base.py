@@ -31,12 +31,20 @@ class BaseExample:
     extra_feature = dict()
 
     @abstractmethod
+    def set_config(self, **params):
+        pass
+
+    @staticmethod
+    def deal_image(image_reader, label_reader):
+        pass
+
+    @abstractmethod
     def _create_example_format(self):
         pass
 
     def write_example(self, i, fold):
         for j, data in enumerate(fold):
-            print("\r>> Converting {}: fold {}, {}/{}".format(str(self.__class__), i + 1, j + 1, len(fold)), end='')
+            print("\r>> Converting {}: fold {}, {}/{}".format(self.name, i + 1, j + 1, len(fold)), end='')
             self.image_reader.read(data['image'])
             self.label_reader.read(data['label'])
 

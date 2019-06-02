@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from model_component.config import CustomKeys
 
 
 def get_loss(loss_name, logits, label, **kwargs):
@@ -43,3 +44,20 @@ def weighted_sparse_softmax_cross_entropy(logits, label, classes, **kwargs):
         weights = _compute_weights()
         loss = tf.losses.sparse_softmax_cross_entropy(label, logits, weights)
         return loss
+
+
+def sparse_dice_loss(logits, labels, eps, **kwargs):
+    eps = float(eps)
+    dim = len(logits.get_shape())
+    sum_axis = list(range(1, dim))
+    with tf.variable_scope("DiceLoss"):
+        float_logits = tf.cast(logits, tf.float32)
+        float_labels = tf.cast(labels, tf.float32)
+        AB = tf.reduce_sum(float_logits * float_labels, axis=sum_axis)
+        A = tf.reduce_sum(float_logits, axis=sum_axis)
+        B = tf.reduce_sum(float_labels, axis=sum_axis)
+        dice = (2 * AB + eps) / (A + B + eps)
+        mean_dice_loss = tf.reduce_mean(dice, name="value")
+        dice_loss = - mean_dice_loss
+        tf.losses.add_loss(dice_loss, CustomKeys.LOSSES)
+        return dice_loss

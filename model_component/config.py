@@ -12,6 +12,7 @@ class CustomKeys:
     GLOBAL_STEP = ops.GraphKeys.GLOBAL_STEP
     SAVERS = ops.GraphKeys.SAVERS
     SUMMARIES = tf.GraphKeys.SUMMARIES
+    LOSSES = tf.GraphKeys.LOSSES
     UPDATE_OPS = tf.GraphKeys.UPDATE_OPS
     TRAIN = ModeKeys.TRAIN
     EVAL = ModeKeys.EVAL

@@ -1,9 +1,9 @@
-CUDA_VISIBLE_DEVICES: '0'
+CUDA_VISIBLE_DEVICES: '3'
 random_seed: 1234
 batch_size: 4
 
 estimator:
-  num_steps: 400000
+  num_steps: 200000
   save_summary_steps: 200
   save_checkpoints_steps: 5000
   keep_checkpoint_max: 1
@@ -20,18 +20,18 @@ dataset:
       value: TrainMode
       dataset_path: 'train_TwoDExample.yaml'
     EVAL:
-      value: EvalMode
-      dataset_path: 'eval_TwoDExample.yaml'
+      value: EvalMode3D
+      dataset_path: 'eval_ThreeDExample.yaml'
       evaluator:
-        name: 'SliceEvaluator'
-        eval_steps: 7720
+        name: 'VolumeEvaluator'
+        eval_steps: 100
         metric_list:
           - 'Dice'
         save_image: false
         show_each_evaluate: false
 
   min_window_level: 0
-  max_window_level: 2000
+  max_window_level: 5000
   image_height: 256
   image_width: 256
   num_parallel_batches: 1
@@ -55,13 +55,13 @@ model:
           weight: 0.5
         carcass:
           show: true
-          weight: 1
+          weight: 2
       loss:
-        name: 'sparse_softmax_cross_entropy'
+        name: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
         dice:
           eps: 1e-5
-      num_down_samples: 4
+      num_down_samples: 6
 
   solver:
     slow_start_step: 0
@@ -69,8 +69,8 @@ model:
     learning_rate:
       name: 'piecewise_constant'
       boundaries:
-        - 200000
-        - 300000 # learning_rate_decay_boundaries
+        - 100000
+        - 150000 # learning_rate_decay_boundaries
       values:
         - 0.003
         - 0.0003

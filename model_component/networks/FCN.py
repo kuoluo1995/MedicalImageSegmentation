@@ -2,8 +2,8 @@ from model_component.networks.base import *
 from model_component.config import CustomKeys
 
 
-class UNet(BaseNet):
-    name = 'UNet'
+class FCN(BaseNet):
+    name = 'FCN'
     num_down_samples = None
 
     def set_config(self, **params):
@@ -38,28 +38,18 @@ class UNet(BaseNet):
 
     def _build_network(self, image):
         tf.logging.info('................>>>>>>>>>>>>>>>> building {} network'.format(self.name))
-        with tf.variable_scope('UNet'):
+        with tf.variable_scope('FCN'):
             tensor_out = image
             out_channels = self.init_channels
             # 下采样
-            encoder_layers = dict()
             for i in range(self.num_down_samples):
                 with tf.variable_scope('Encode{:d}'.format(i + 1)):
                     tensor_out = slim.repeat(tensor_out, 2, slim.conv2d, out_channels, 3)
-                    encoder_layers['Encode{:d}'.format(i + 1)] = tensor_out
                     tensor_out = slim.max_pool2d(tensor_out, [2, 2])
                 out_channels *= 2
 
             # 下采样和上采样之间的桥
             tensor_out = slim.repeat(tensor_out, 2, slim.conv2d, out_channels, 3, scope="Encode-Decode-Bridge")
-
-            # 上采样
-            for i in reversed(range(self.num_down_samples)):
-                out_channels /= 2
-                with tf.variable_scope("Decode{:d}".format(i + 1)):
-                    tensor_out = slim.conv2d_transpose(tensor_out, tensor_out.get_shape()[-1] // 2, 2, 2)
-                    tensor_out = tf.concat((encoder_layers['Encode{:d}'.format(i + 1)], tensor_out), axis=-1)
-                    tensor_out = slim.repeat(tensor_out, 2, slim.conv2d, out_channels, 3)
 
             # 最后一把全连接 转化成输出图片 todo test 这个的效果如何 slim.arg_scope
             with slim.arg_scope([slim.conv2d], activation_fn=None, normalizer_fn=None, normalizer_params=None):

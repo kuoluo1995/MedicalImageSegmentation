@@ -76,5 +76,5 @@ class BaseEvaluate:
         pass
 
     @abstractmethod
-    def evaluate(self):
+    def evaluate(self, graph):
         pass
