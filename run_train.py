@@ -9,7 +9,7 @@ from model_component import config
 
 def main():
     # 训练数据
-    config_file = 'carcass_3d_unet_organ'
+    config_file = 'carcass_3d_unet6_dsc'
     estimate = MyEstimator()
     estimate_config = yaml.load(open('config/train/' + config_file + '.yaml', 'rb'))
     estimate_config.setdefault('tag', config_file)

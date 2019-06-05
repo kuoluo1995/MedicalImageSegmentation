@@ -48,10 +48,7 @@ class FCN(BaseNet):
                     tensor_out = slim.max_pool2d(tensor_out, [2, 2])
                 out_channels *= 2
 
-            # 下采样和上采样之间的桥
-            tensor_out = slim.repeat(tensor_out, 2, slim.conv2d, out_channels, 3, scope="Encode-Decode-Bridge")
-
-            # 最后一把全连接 转化成输出图片 todo test 这个的效果如何 slim.arg_scope
+            # 最后一把全连接 转化成输出图片
             with slim.arg_scope([slim.conv2d], activation_fn=None, normalizer_fn=None, normalizer_params=None):
                 logits = slim.conv2d(tensor_out, len(self.classes), 1, scope="AdjustChannels")
                 return logits

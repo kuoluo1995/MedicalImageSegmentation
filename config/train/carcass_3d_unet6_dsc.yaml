@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES: '3'
+CUDA_VISIBLE_DEVICES: '2'
 random_seed: 1234
 batch_size: 4
 
@@ -17,8 +17,8 @@ dataset:
   modes: # 这里包含了具体几个模式的信息
     TRAIN:
       primary: true
-      value: TrainMode
-      dataset_path: 'train_TwoDExample.yaml'
+      value: TrainMode3D
+      dataset_path: 'train_ThreeDExample.yaml'
     EVAL:
       value: EvalMode3D
       dataset_path: 'eval_ThreeDExample.yaml'
@@ -27,7 +27,7 @@ dataset:
         eval_steps: 100
         metric_list:
           - 'Dice'
-        save_image: false
+        save_image: true
         show_each_evaluate: false
 
   min_window_level: 0
@@ -36,11 +36,10 @@ dataset:
   image_width: 256
   num_parallel_batches: 1
   image_augmentation:
-    random_zoom_in:
+    random_volume_zoom_in:
       max_scale: 1.5
     #    random_noise:
     #      scale: 0.05
-    random_horizontally_flip: None
 
 model:
   model_dir: '_model_dir'

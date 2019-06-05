@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES: '0'
+CUDA_VISIBLE_DEVICES: '2'
 random_seed: 1234
 batch_size: 4
 
@@ -27,7 +27,7 @@ dataset:
         eval_steps: 100
         metric_list:
           - 'Dice'
-        save_image: false
+        save_image: true
         show_each_evaluate: false
 
   min_window_level: 0
@@ -60,7 +60,7 @@ model:
       train_metrics:
         dice:
           eps: 1e-5
-      num_down_samples: 5
+      num_down_samples: 6
 
   solver:
     slow_start_step: 0

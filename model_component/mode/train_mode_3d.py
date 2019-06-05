@@ -20,14 +20,15 @@ class TrainMode3D(BaseMode):
                 feature, label3d, = self.example.read_example(example_proto, self, **params)
                 with tf.variable_scope('Augmentation'):
                     # todo test 数据增广对函数的影响和其他方法
-                    for function_name in params['image_augmentation']:
-                        kwargs = {} if params['image_augmentation'][function_name] == 'None' else \
-                            params['image_augmentation'][function_name]
-                        feature[CustomKeys.IMAGE], new_label = image_process_operations.process_image(
-                            function_name=function_name, image=feature[CustomKeys.IMAGE], label=label3d, **kwargs,
-                            **params)
-                        if new_label is not None:
-                            label3d = new_label
+                    if params['image_augmentation'] is not None:
+                        for function_name in params['image_augmentation']:
+                            kwargs = {} if params['image_augmentation'][function_name] == 'None' else \
+                                params['image_augmentation'][function_name]
+                            feature[CustomKeys.IMAGE], new_label = image_process_operations.process_image(
+                                function_name=function_name, image=feature[CustomKeys.IMAGE], label=label3d, **kwargs,
+                                **params)
+                            if new_label is not None:
+                                label3d = new_label
 
                 with tf.variable_scope('UnitedImageSize'):
                     image3d = tf.image.resize_bilinear(tf.expand_dims(feature[CustomKeys.IMAGE], axis=-1),

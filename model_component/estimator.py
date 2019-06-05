@@ -34,7 +34,8 @@ class MyEstimator:
 
     def _get_global_step(self, graph):
         with variable_scope.variable_scope(self.tag):
-            training.get_or_create_global_step(graph)
+            step = training.create_global_step(graph)
+            training_util._get_or_create_global_step_read(graph)
 
     def _get_input_pipeline(self):
         with tf.variable_scope('InputPipeline/'):

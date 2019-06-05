@@ -8,7 +8,7 @@ from model_component import config
 
 
 def main():
-    config_file = 'new_carcass_3d_unet'
+    config_file = 'carcass_3d_unet_channel_1'
     evaluate_config = yaml.load(open('config/evaluate/' + config_file + '.yaml', 'rb'))
     evaluate_config.setdefault('tag', config_file)
     config.set_logger(config.CustomKeys.EVAL, evaluate_config['tag'])

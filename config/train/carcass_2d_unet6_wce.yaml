@@ -3,7 +3,7 @@ random_seed: 1234
 batch_size: 4
 
 estimator:
-  num_steps: 200000
+  num_steps: 400000
   save_summary_steps: 200
   save_checkpoints_steps: 5000
   keep_checkpoint_max: 1
@@ -31,7 +31,7 @@ dataset:
         show_each_evaluate: false
 
   min_window_level: 0
-  max_window_level: 5000
+  max_window_level: 2000
   image_height: 256
   image_width: 256
   num_parallel_batches: 1
@@ -40,7 +40,7 @@ dataset:
       max_scale: 1.5
     #    random_noise:
     #      scale: 0.05
-    random_horizontally_flip: None
+#    random_horizontally_flip: None
 
 model:
   model_dir: '_model_dir'
@@ -57,8 +57,7 @@ model:
           show: true
           weight: 2
       loss:
-        name: 'sparse_dice_loss'
-        eps: 1e-5
+        name: 'weighted_sparse_softmax_cross_entropy'
       train_metrics:
         dice:
           eps: 1e-5
@@ -70,8 +69,8 @@ model:
     learning_rate:
       name: 'piecewise_constant'
       boundaries:
-        - 100000
-        - 150000 # learning_rate_decay_boundaries
+        - 200000
+        - 300000 # learning_rate_decay_boundaries
       values:
         - 0.003
         - 0.0003

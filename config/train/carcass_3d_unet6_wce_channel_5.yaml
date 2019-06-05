@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES: '0'
+CUDA_VISIBLE_DEVICES: '1'
 random_seed: 1234
 batch_size: 4
 
@@ -17,11 +17,11 @@ dataset:
   modes: # 这里包含了具体几个模式的信息
     TRAIN:
       primary: true
-      value: TrainMode
-      dataset_path: 'train_TwoDExample_channel_1.yaml'
+      value: TrainMode3D
+      dataset_path: 'train_ThreeDExample_channel_5.yaml'
     EVAL:
       value: EvalMode3D
-      dataset_path: 'eval_ThreeDExample_channel_1.yaml'
+      dataset_path: 'eval_ThreeDExample_channel_5.yaml'
       evaluator:
         name: 'VolumeEvaluator'
         eval_steps: 100
@@ -36,11 +36,11 @@ dataset:
   image_width: 256
   num_parallel_batches: 1
   image_augmentation:
-    random_zoom_in:
+    random_volume_zoom_in:
       max_scale: 1.5
     #    random_noise:
     #      scale: 0.05
-    random_horizontally_flip: None
+    # random_horizontally_flip: None
 
 model:
   model_dir: '_model_dir'
