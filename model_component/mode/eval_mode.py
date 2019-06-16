@@ -40,10 +40,10 @@ class EvalMode(BaseMode):
             return dataset
 
     def adjust_window_size(self, image, min_window, max_window):
-        image = image_process_operations.adjust_window_size(image, min_window, max_window)
+        image = image_process_utils.adjust_window_size(image, min_window, max_window)
         return image
 
     def get_extra_feature(self, **params):
-        self.dataset_dict = yaml_tools.read(params['base_path'] / self.dataset_path)
-        self.example = example_tools.create_example(self.dataset_dict['example'])
+        self.dataset_dict = yaml_utils.read(params['base_path'] / self.dataset_path)
+        self.example = example_utils.create_example(self.dataset_dict['example'])
         return self.example.extra_feature

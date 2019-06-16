@@ -2,8 +2,8 @@ import nibabel
 import SimpleITK
 from nibabel import AnalyzeHeader
 
-from utils.reader_tools.image_reader import ImageReader
-from utils.reader_tools.volume_reader import VolumeReader
+from utils.reader_utils.image_reader import ImageReader
+from utils.reader_utils.volume_reader import VolumeReader
 
 
 def create_reader(reader_name, **params):

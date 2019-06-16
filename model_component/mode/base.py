@@ -6,7 +6,7 @@ from tensorflow.python import ops
 from tensorflow.python.data import Dataset, experimental, TFRecordDataset
 from tensorflow.python.estimator import util
 from model_component.config import CustomKeys
-from utils import example_tools, image_process_operations, yaml_tools
+from utils import example_utils, image_process_utils, yaml_utils
 
 
 class BaseMode:

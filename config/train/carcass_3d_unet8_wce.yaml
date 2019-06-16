@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES: '2'
+CUDA_VISIBLE_DEVICES: '0'
 random_seed: 1234
 batch_size: 4
 
@@ -60,7 +60,7 @@ model:
       train_metrics:
         dice:
           eps: 1e-5
-      num_down_samples: 6
+      num_down_samples: 7
 
   solver:
     slow_start_step: 0

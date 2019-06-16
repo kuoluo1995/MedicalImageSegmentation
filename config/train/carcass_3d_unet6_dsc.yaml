@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES: '2'
+CUDA_VISIBLE_DEVICES: '1'
 random_seed: 1234
 batch_size: 4
 
@@ -27,7 +27,7 @@ dataset:
         eval_steps: 100
         metric_list:
           - 'Dice'
-        save_image: true
+        save_image: false
         show_each_evaluate: false
 
   min_window_level: 0
@@ -72,9 +72,9 @@ model:
         - 100000
         - 150000 # learning_rate_decay_boundaries
       values:
-        - 0.003
         - 0.0003
-        - 0.0001 # learning_rate_custom_values
+        - 0.00003
+        - 0.00001 # learning_rate_custom_values
     optimizer:
       name: 'adam'
       beta1: 0.9 # 参数什么意思

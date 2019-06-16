@@ -3,7 +3,7 @@ from pathlib import Path
 from tensorflow import Dimension, TensorShape
 
 from model_component.mode.base import *
-from utils import reader_tools
+from utils import reader_utils
 
 
 class TrainMode3D(BaseMode):
@@ -24,7 +24,7 @@ class TrainMode3D(BaseMode):
                         for function_name in params['image_augmentation']:
                             kwargs = {} if params['image_augmentation'][function_name] == 'None' else \
                                 params['image_augmentation'][function_name]
-                            feature[CustomKeys.IMAGE], new_label = image_process_operations.process_image(
+                            feature[CustomKeys.IMAGE], new_label = image_process_utils.process_image(
                                 function_name=function_name, image=feature[CustomKeys.IMAGE], label=label3d, **kwargs,
                                 **params)
                             if new_label is not None:
@@ -80,10 +80,10 @@ class TrainMode3D(BaseMode):
         max_window_tensor = tf.random_uniform([], -50, 50)
         new_min_window = tf.add(float(min_window), min_window_tensor, name='min_window')
         new_max_window = tf.add(float(max_window), max_window_tensor, name='max_window')
-        image = image_process_operations.adjust_window_size(image, new_min_window, new_max_window)
+        image = image_process_utils.adjust_window_size(image, new_min_window, new_max_window)
         return image
 
     def get_extra_feature(self, **params):
-        self.dataset_dict = yaml_tools.read(params['base_path'] / self.dataset_path)
-        self.example = example_tools.create_example(self.dataset_dict['example'])
+        self.dataset_dict = yaml_utils.read(params['base_path'] / self.dataset_path)
+        self.example = example_utils.create_example(self.dataset_dict['example'])
         return self.example.extra_feature

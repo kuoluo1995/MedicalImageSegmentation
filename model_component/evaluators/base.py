@@ -8,9 +8,9 @@ from pathlib import Path
 
 from model_component import metrics_function
 from model_component.config import CustomKeys
-from utils.timer import Timer
-from utils.reader_tools import VolumeReader
-from utils.map_struct import flat_dict_convert_solid_dict
+from utils.timer_utils import Timer
+from utils.reader_utils import VolumeReader
+from utils.map_struct_utils import flat_dict_convert_solid_dict
 
 
 class BaseEvaluate:

@@ -5,7 +5,7 @@ dataset:
 
   source_data:
     path:  '/home/yf/Corpus_Callosum' #'E:/Corpus_Callosum'
-    reader_tools: 'ImageReader'
+    reader_utils: 'ImageReader'
     extra:
 
   output_data:

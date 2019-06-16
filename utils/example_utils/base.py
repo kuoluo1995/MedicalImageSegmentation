@@ -2,7 +2,7 @@ import tensorflow as tf
 from abc import abstractmethod
 from collections import Iterable
 from model_component.config import CustomKeys
-from utils import image_process_operations
+from utils import image_process_utils
 
 
 def feature_to_int64_list(value):

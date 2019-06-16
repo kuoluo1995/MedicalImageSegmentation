@@ -109,7 +109,7 @@ def metric_3d(logits3d, labels3d, required=None, **kwargs):
     spacing = kwargs.get("spacing", [1., 1., 1.])
 
     if need_dist_map:
-        from utils.surface import Surface
+        from utils.surface_utils import Surface
         if np.count_nonzero(logits3d) == 0 or np.count_nonzero(labels3d) == 0:
             metrics_3d['ASSD'] = 0
             metrics_3d['MSD'] = 0

@@ -7,14 +7,14 @@ from tensorflow.python.framework import dtypes, ops
 from tensorflow.python.ops import array_ops
 from pathlib import Path
 
-from utils import example_tools, reader_tools, yaml_tools
+from utils import example_utils, reader_utils, yaml_utils
 
 
 def _get_records(records):
     tf_records = []
     for x in records:
         record = Path(__file__).parent.parent / 'data' / x
-        tf_records.append(yaml_tools.read(record))
+        tf_records.append(yaml_utils.read(record))
     return tf_records
 
 
@@ -76,8 +76,8 @@ class BaseDataset:
             dict_ = dict()
             dict_['k'] = self.k
             dict_['k_folds'] = random_split_k_folds(source_data)
-            yaml_tools.write(self._k_folds_record, dict_)
-        dict_ = yaml_tools.read(self._k_folds_record)
+            yaml_utils.write(self._k_folds_record, dict_)
+        dict_ = yaml_utils.read(self._k_folds_record)
         self.k = dict_['k']
         return dict_['k_folds']
 
@@ -91,7 +91,7 @@ class BaseDataset:
         train_dict['dataset'] = list(str(dataset[i]) for i in range(train_dict['dataset_size']))
         train_dataset_path = self._output_data_path / 'train_{}_channel_{}.yaml'.format(example_name,
                                                                                         self.image_channel)
-        yaml_tools.write(train_dataset_path, train_dict)
+        yaml_utils.write(train_dataset_path, train_dict)
 
         # 保存测试结果
         eval_dict = dict()
@@ -102,7 +102,7 @@ class BaseDataset:
         eval_dict['dataset'] = list(str(dataset[i]) for i in range(train_dict['dataset_size'], len(dataset)))
         eval_dataset_path = self._output_data_path / 'eval_{}_channel_{}.yaml'.format(example_name,
                                                                                       self.image_channel)
-        yaml_tools.write(eval_dataset_path, eval_dict)
+        yaml_utils.write(eval_dataset_path, eval_dict)
 
     def build_dataset(self):
         # 获取data
@@ -123,7 +123,7 @@ class BaseDataset:
                 output_path = record_fold / '{}_channel_{}-{}-of-{}.tfrecord'.format(example_name, self.image_channel,
                                                                                      i + 1, self.k)
                 with tf.io.TFRecordWriter(str(output_path)) as example_writer:
-                    example = example_tools.create_example(example_name)
+                    example = example_utils.create_example(example_name)
                     example.set_config(writer=example_writer, dataset_class=self, image_reader=self._image_reader,
                                        label_reader=self._label_reader)
                     example.write_example(i, fold)

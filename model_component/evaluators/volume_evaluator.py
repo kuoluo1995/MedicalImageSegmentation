@@ -78,6 +78,7 @@ class VolumeEvaluator(BaseEvaluate):
                     labels[key].append(value[CustomKeys.LABEL])
             else:
                 evaluate_case()
+                current_step += 1
                 for key in predict[CustomKeys.CLASSES]:
                     logits[key].clear()
                     labels[key].clear()

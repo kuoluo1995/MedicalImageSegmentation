@@ -8,9 +8,9 @@ from tensorflow.python.training.session_run_hook import SessionRunArgs
 from tensorflow.python.training.session_run_hook import SessionRunHook
 from tensorflow.python.training.summary_io import SummaryWriterCache
 from model_component.config import CustomKeys
-from utils import summary_tools
+from utils import summary_utils
 
-from utils import yaml_tools
+from utils import yaml_utils
 
 
 class BestCheckpointSaverHook(SessionRunHook):
@@ -30,7 +30,7 @@ class BestCheckpointSaverHook(SessionRunHook):
         self._better_result = None
 
         if self._get_best_result_dump_file().exists():
-            self._better_result = yaml_tools.read(self._get_best_result_dump_file())
+            self._better_result = yaml_utils.read(self._get_best_result_dump_file())
             tf.logging.info("load completed best result records")
 
     def begin(self):
@@ -86,7 +86,7 @@ class BestCheckpointSaverHook(SessionRunHook):
                 continue
             tags.append(self._summary_tag.format(key))
             values.append(value)
-        summary_tools.scalar(self._summary_writer, step, tags, values)
+        summary_utils.scalar(self._summary_writer, step, tags, values)
 
     def _save(self, session, step):
         """Saves the better checkpoint, returns should_stop."""
@@ -95,7 +95,7 @@ class BestCheckpointSaverHook(SessionRunHook):
         self._need_save = False
         self._get_saver().save(session, self._checkpoint_path, global_step=step,
                                latest_filename="checkpoint_best")
-        yaml_tools.write(self._get_best_result_dump_file(), self._get_result())
+        yaml_utils.write(self._get_best_result_dump_file(), self._get_result())
         should_stop = False
         tf.logging.info("saved best checkpoints for {} into {}".format(step, str(self._checkpoint_path)))
         return should_stop

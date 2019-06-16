@@ -54,11 +54,10 @@ def sparse_dice_loss(logits, labels, eps, **kwargs):
     one_hot_label = tf.one_hot(labels, n_classes, dtype=tf.float32)
     with tf.variable_scope("DiceLoss"):
         float_logits = tf.cast(logits, tf.float32)
-
         AB = tf.reduce_sum(one_hot_label * float_logits, axis=sum_axis)
         AandB = tf.reduce_sum(float_logits + one_hot_label, axis=sum_axis)
-        dice = (2 * AB + eps) / (AandB + eps)
+        dice = (2.0 * AB + eps) / (AandB + eps)
         mean_dice_loss = tf.reduce_mean(dice, name="value")
-        dice_loss = - mean_dice_loss
+        dice_loss = 1.0 - mean_dice_loss
         tf.losses.add_loss(dice_loss, CustomKeys.LOSSES)
         return dice_loss

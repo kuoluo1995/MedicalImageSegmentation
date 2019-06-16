@@ -1,0 +1,53 @@
+CUDA_VISIBLE_DEVICES: '1'
+random_seed: 1234
+batch_size: 4
+
+evaluator:
+  name: VolumeEvaluator
+  eval_steps:  10
+  metric_list:
+    - 'Dice'
+  save_image: true
+  show_each_evaluate: true
+
+dataset:
+  name: 'CarcassDataset'
+  modes: # 这里包含了具体几个模式的信息
+    PREDICT:
+      primary: true
+      value: EvalMode3D
+      dataset_path: 'eval_ThreeDExample.yaml'
+
+  image_height: 256
+  image_width: 256
+  min_window_level: 0
+  max_window_level: 5000
+  num_parallel_batches: 1
+  image_augmentation:
+
+estimator:
+  allow_soft_placement: true
+  gpu_options_allow_growth: true
+
+model:
+  model_dir: '_model_dir'
+  networks:
+    UNet:
+      is_training: false
+      init_channels: 64
+      classes:
+        background:
+          show: false
+          weight: 0.5
+        carcass:
+          show: true
+          weight: 2
+      loss: 'weighted_sparse_softmax_cross_entropy'
+      train_metrics:
+        dice:
+          eps: 1e-5
+      num_down_samples: 5
+
+
+
+

@@ -1,4 +1,4 @@
-from utils.reader_tools.image_reader import *
+from utils.reader_utils.image_reader import *
 
 
 class VolumeReader(ImageReader):

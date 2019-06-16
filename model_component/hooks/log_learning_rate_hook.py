@@ -3,7 +3,7 @@ from tensorflow.python.framework import ops
 from tensorflow.python.training import training_util
 from tensorflow.python.training.session_run_hook import SessionRunHook, SessionRunArgs
 from tensorflow.python.training.basic_session_run_hooks import SecondOrStepTimer
-from utils import summary_tools
+from utils import summary_utils
 from model_component.config import CustomKeys
 
 
@@ -33,4 +33,4 @@ class LogLearningRateHook(SessionRunHook):
 
     def _log_and_record(self, learning_rate, step):
         if self._summary_writer is not None:
-            summary_tools.scalar(self._summary_writer, step, [self.summary_tag], [learning_rate])
+            summary_utils.scalar(self._summary_writer, step, [self.summary_tag], [learning_rate])

@@ -1,26 +1,34 @@
-CUDA_VISIBLE_DEVICES: '0'
+CUDA_VISIBLE_DEVICES: '1'
 random_seed: 1234
 batch_size: 4
 
-evaluator:
-  name: VolumeEvaluator
-  eval_steps:  10
-  metric_list:
-    - 'Dice'
-  save_image: true
-  show_each_evaluate: true
-
 estimator:
+  num_steps: 400000
+  save_summary_steps: 500
+  save_checkpoints_steps: 5000
+  keep_checkpoint_max: 10
+  log_step_count_steps: 500
   allow_soft_placement: true
   gpu_options_allow_growth: true
+  save_best_checkpoint: true
 
 dataset:
   name: 'CarcassDataset'
   modes: # 这里包含了具体几个模式的信息
-    PREDICT:
+    TRAIN:
       primary: true
+      value: TrainMode3D
+      dataset_path: 'train_ThreeDExample_channel_1.yaml'
+    EVAL:
       value: EvalMode3D
-      dataset_path: 'eval_ThreeDExample.yaml'
+      dataset_path: 'eval_ThreeDExample_channel_1.yaml'
+      evaluator:
+        name: 'VolumeEvaluator'
+        eval_steps: 100
+        metric_list:
+          - 'Dice'
+        save_image: false
+        show_each_evaluate: false
 
   min_window_level: 0
   max_window_level: 5000
@@ -28,6 +36,11 @@ dataset:
   image_width: 256
   num_parallel_batches: 1
   image_augmentation:
+    random_volume_zoom_in:
+      max_scale: 1.5
+    #    random_noise:
+    #      scale: 0.05
+    # random_horizontally_flip: None
 
 model:
   model_dir: '_model_dir'
@@ -56,8 +69,8 @@ model:
     learning_rate:
       name: 'piecewise_constant'
       boundaries:
-        - 100000
-        - 150000 # learning_rate_decay_boundaries
+        - 200000
+        - 300000 # learning_rate_decay_boundaries
       values:
         - 0.003
         - 0.0003

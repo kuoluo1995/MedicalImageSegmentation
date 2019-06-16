@@ -1,6 +1,6 @@
 import numpy as np
 from pathlib import Path
-from utils import reader_tools
+from utils import reader_utils
 
 
 class ImageReader:
@@ -28,8 +28,8 @@ class ImageReader:
     def read(self, image_file):
         self.image_path = str(image_file)
         self.format = Path(image_file).suffix[1:]
-        self._reader = eval('reader_tools.' + self.format + '_reader')
-        self._writer = eval('reader_tools.' + self.format + '_writer')
+        self._reader = eval('reader_utils.' + self.format + '_reader')
+        self._writer = eval('reader_utils.' + self.format + '_writer')
         self._decode = self._reader(image_file)
         if self._decode.dtype == float:
             self._decode += 0.5
@@ -69,8 +69,8 @@ class ImageReader:
     def read_header_dict(self, image_path):
         self.image_path = str(image_path)
         self.format = Path(image_path).suffix[1:]
-        self._reader = eval('reader_tools.' + self.format + '_header_reader')
-        self._writer = eval('reader_tools.' + self.format + '_writer')
+        self._reader = eval('reader_utils.' + self.format + '_header_reader')
+        self._writer = eval('reader_utils.' + self.format + '_writer')
         self.header = self._reader(image_path)
 
     def save(self, image_array, image_path):

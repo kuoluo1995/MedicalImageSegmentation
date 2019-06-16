@@ -1,14 +1,3 @@
-"""
-@package medpy.metric.surface
-Holds a metrics class computing surface metrics over two 3D-images contain each a binary object.
-Classes:
-    - Surface: Computes different surface metrics between two 3D-images contain each an object.
-@author Oskar Maier
-@version r0.4.1
-@since 2011-12-01
-@status Release
-"""
-
 # build-in modules
 import math
 
